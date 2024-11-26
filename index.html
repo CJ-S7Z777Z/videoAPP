@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мини-приложение</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Подключение стилей -->
+    <style>
+        /* Общие стили */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #FFFFFF;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Скрытый контент до загрузки */
+        .hidden {
+            display: none;
+        }
+
+        /* Анимация загрузки */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #121212;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #1DB954;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Плавная подсветка */
+        #gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(-45deg, #1DB954, #1E90FF, #FF69B4, #FFA500);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            z-index: -1;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% {background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Главный контент */
+        #app-content {
+            padding: 20px;
+        }
+
+        /* Профиль пользователя */
+        .profile {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #1DB954;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            color: #FFFFFF;
+            margin-right: 15px;
+            overflow: hidden;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .user-info h2, .user-info p {
+            margin: 0;
+        }
+
+        /* Остаток по тарифу */
+        .balance-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        #no-tariff-banner {
+            background-color: #FF3B30;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        #balance-info h1 {
+            font-size: 48px;
+            margin: 0;
+        }
+
+        #balance-info p {
+            margin: 5px 0;
+        }
+
+        /* Статус */
+        #status {
+            color: #FF3B30; /* Красный по умолчанию (Неактивен) */
+            font-weight: bold;
+        }
+
+        #status.active {
+            color: #4CD964; /* Зеленый (Активен) */
+        }
+
+        /* Навигационная панель */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #1E1E1E;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        .nav-button {
+            background: none;
+            border: none;
+            color: #FFFFFF;
+            font-size: 16px;
+            flex-grow: 1;
+            padding: 10px 0;
+            cursor: pointer;
+        }
+
+        .nav-button.active {
+            border-top: 2px solid #1DB954;
+            color: #1DB954;
+        }
+
+        /* Переключатель */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            background-color: #ccc;
+            border-radius: 34px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #4CD964;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Страница настроек */
+        .settings {
+            padding: 20px;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        /* Кнопка "Назад" */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            color: #FFFFFF;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Дополнительные стили */
+        h2, h1 {
+            margin: 0;
+        }
+    </style>
+
+    <!-- Инициализация Telegram Web App -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <!-- Анимация загрузки -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Основной контент -->
+    <div id="app" class="hidden">
+        <!-- Плавная подсветка -->
+        <div id="gradient"></div>
+
+        <!-- Контент приложения -->
+        <div id="app-content">
+            <!-- Здесь будет динамически меняться содержимое -->
+        </div>
+
+        <!-- Навигационная панель -->
+        <div class="navbar">
+            <button class="nav-button active" id="nav-home">Главная</button>
+            <button class="nav-button" id="nav-tariffs">Тарифы</button>
+            <button class="nav-button" id="nav-profile">Профиль</button>
+            <button class="nav-button" id="nav-settings">Настройки</button>
+        </div>
+    </div>
+
+    <!-- Скрипт для логики приложения -->
+    <script>
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            // Проверка наличия Telegram Web App или создание заглушки для тестирования в браузере
+            let tg = window.Telegram ? window.Telegram.WebApp : null;
+
+            if (!tg) {
+                // Заглушка для тестирования в браузере
+                tg = {
+                    initDataUnsafe: {
+                        user: {
+                            first_name: 'Тест',
+                            last_name: 'Пользователь',
+                            username: 'testuser',
+                            photo_url: ''
+                        }
+                    },
+                    expand: function() {},
+                };
+                console.warn('Telegram WebApp не найден. Используется заглушка для тестирования.');
+            }
+
+            try {
+                // Устанавливаем полноэкранный режим
+                tg.expand();
+
+                // Получаем элементы DOM
+                const loader = document.getElementById('loader');
+                const app = document.getElementById('app');
+                const appContent = document.getElementById('app-content');
+                const gradientElem = document.getElementById('gradient');
+
+                // Навигационные кнопки
+                const navButtons = document.querySelectorAll('.nav-button');
+                navButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        navButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        navigateTo(button.id);
+                    });
+                });
+
+                // Данные пользователя
+                const initData = tg.initDataUnsafe.user;
+                let userFirstName = 'Имя';
+                let userLastName = '';
+                let username = '';
+                let userPhoto = '';
+                if (initData) {
+                    userFirstName = initData.first_name || '';
+                    userLastName = initData.last_name || '';
+                    username = initData.username ? '@' + initData.username : '';
+                    userPhoto = initData.photo_url || '';
+                }
+
+                // Настройки пользователя
+                let isHighlightEnabled = true; // Подсветка включена по умолчанию
+
+                // Данные о тарифе пользователя
+                let userBalance = 0; // Получить из бота через API
+                let userStatus = 'Неактивен';
+                let userTariff = '—';
+
+                // Функция обновления информации о тарифе
+                function updateTariffInfo() {
+                    if (userBalance > 0) {
+                        userStatus = 'Активен';
+                        userTariff = 'Ваш тариф';
+                    } else {
+                        userStatus = 'Неактивен';
+                        userTariff = '—';
+                    }
+                }
+
+                // Функция перехода на страницу
+                function navigateTo(pageId) {
+                    appContent.innerHTML = ''; // Очищаем контент
+
+                    // Добавляем кнопку "Назад" для страниц кроме главной
+                    if (pageId !== 'nav-home') {
+                        const backButton = document.createElement('button');
+                        backButton.className = 'back-button';
+                        backButton.innerHTML = '←';
+                        backButton.addEventListener('click', () => {document.getElementById('nav-home').click();
+                        });
+                        appContent.appendChild(backButton);
+                    }
+
+                    switch(pageId) {
+                        case 'nav-home':
+                            renderHomePage();
+                            break;
+                        case 'nav-tariffs':
+                            renderTariffsPage();
+                            break;
+                        case 'nav-profile':
+                            renderProfilePage();
+                            break;
+                        case 'nav-settings':
+                            renderSettingsPage();
+                            break;
+                        default:
+                            renderHomePage();
+                    }
+                }
+
+                // Функция рендеринга главной страницы
+                function renderHomePage() {
+                    updateTariffInfo();
+
+                    // Остаток по тарифу
+                    const balanceSection = document.createElement('div');
+                    balanceSection.className = 'balance-section';
+
+                    // Плашка при отсутствии тарифа
+                    if (userBalance === 0) {
+                        const noTariffBanner = document.createElement('div');
+                        noTariffBanner.id = 'no-tariff-banner';
+                        noTariffBanner.innerHTML = 'У вас не оформлен тариф. Перейдите в раздел <strong>"Тарифы"</strong>.';
+                        noTariffBanner.addEventListener('click', () => {
+                            document.getElementById('nav-tariffs').click();
+                        });
+                        balanceSection.appendChild(noTariffBanner);
+                    }
+
+                    // Информация о балансе
+                    const balanceInfo = document.createElement('div');
+                    balanceInfo.id = 'balance-info';
+
+                    const balanceElem = document.createElement('h1');
+                    balanceElem.id = 'balance';
+                    balanceElem.textContent = `${userBalance} видео`;
+                    balanceInfo.appendChild(balanceElem);
+
+                    const statusElem = document.createElement('p');
+                    statusElem.id = 'status';
+                    statusElem.textContent = userStatus;
+                    if (userStatus === 'Активен') {
+                        statusElem.classList.add('active');
+                    }
+                    balanceInfo.appendChild(statusElem);
+
+                    const tariffNameElem = document.createElement('p');
+                    tariffNameElem.id = 'tariff-name';
+                    tariffNameElem.textContent = `Тариф: ${userTariff}`;
+                    balanceInfo.appendChild(tariffNameElem);
+
+                    balanceSection.appendChild(balanceInfo);
+
+                    appContent.appendChild(balanceSection);
+                }
+
+                // Функция рендеринга страницы "Тарифы"
+                function renderTariffsPage() {
+                    const tariffsDiv = document.createElement('div');
+                    tariffsDiv.style.padding = '20px';
+
+                    const title = document.createElement('h2');
+                    title.textContent = 'Тарифы';
+                    tariffsDiv.appendChild(title);
+
+                    const info = document.createElement('p');
+                    info.textContent = 'Здесь будут представлены доступные тарифы.';
+                    tariffsDiv.appendChild(info);
+
+                    appContent.appendChild(tariffsDiv);
+                }
+
+                // Функция рендеринга страницы "Профиль"
+                function renderProfilePage() {
+                    const profileDiv = document.createElement('div');
+                    profileDiv.style.padding = '20px';
+
+                    const profileSection = document.createElement('div');
+                    profileSection.className = 'profile';
+
+                    const avatarElem = document.createElement('div');
+                    avatarElem.className = 'avatar';
+
+                    if (userPhoto) {
+                        const img = document.createElement('img');
+                        img.src = userPhoto;
+                        avatarElem.appendChild(img);
+                    } else {
+                        avatarElem.textContent = userFirstName.charAt(0).toUpperCase();
+                    }
+
+                    profileSection.appendChild(avatarElem);
+
+                    const userInfoDiv = document.createElement('div');
+                    userInfoDiv.className = 'user-info';
+
+                    const nameElem = document.createElement('h2');
+                    nameElem.textContent = `${userFirstName} ${userLastName}`.trim();
+                    userInfoDiv.appendChild(nameElem);
+
+                    const usernameElem = document.createElement('p');
+                    usernameElem.textContent = username;
+                    userInfoDiv.appendChild(usernameElem);
+
+                    profileSection.appendChild(userInfoDiv);
+
+                    profileDiv.appendChild(profileSection);
+
+                    appContent.appendChild(profileDiv);
+                }
+
+                // Функция рендеринга страницы "Настройки"
+                function renderSettingsPage() {
+                    const settingsDiv = document.createElement('div');
+                    settingsDiv.className = 'settings';
+
+                    const highlightSetting = document.createElement('div');
+                    highlightSetting.className = 'settings-item';
+
+                    const settingLabel = document.createElement('span');
+                    settingLabel.textContent = 'Подсветка';
+
+                    const switchLabel = document.createElement('label');
+                    switchLabel.className = 'switch';
+
+                    const switchInput = document.createElement('input');
+                    switchInput.type = 'checkbox';
+                    switchInput.checked = isHighlightEnabled;
+                    switchInput.addEventListener('change', () => {
+                        isHighlightEnabled = switchInput.checked;
+                        toggleHighlight();
+                    });
+
+                    const switchSlider = document.createElement('span');
+                    switchSlider.className = 'slider';
+
+                    switchLabel.appendChild(switchInput);
+                    switchLabel.appendChild(switchSlider);
+
+                    highlightSetting.appendChild(settingLabel);
+                    highlightSetting.appendChild(switchLabel);
+
+                    settingsDiv.appendChild(highlightSetting);
+
+                    appContent.appendChild(settingsDiv);
+                }
+
+                // Функция переключения подсветки
+                function toggleHighlight() {
+                    if (isHighlightEnabled) {
+                        gradientElem.style.display = 'block';
+                    } else {
+                        gradientElem.style.display = 'none';
+                    }
+                }
+
+                // Убираем загрузчик и показываем приложение
+                setTimeout(() => {
+                    loader.classList.add('hidden');
+                    app.classList.remove('hidden');
+                    navigateTo('nav-home'); // Переходим на главную страницу
+                }, 500); // Имитируем загрузку данных
+
+            } catch (error) {
+                console.error('Произошла ошибка:', error);
+            }
+        });
+    </script>
+</body>
+</html>
+
