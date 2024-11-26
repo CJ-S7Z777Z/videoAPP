@@ -23,8 +23,6 @@
         }
 
         /* Анимация загрузки */
-
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -54,6 +52,8 @@
         #app-content {
             padding: 20px;
             padding-top: 60px; /* Отступ сверху для безопасной зоны */
+            overflow-y: auto; /* Добавлено для скроллинга */
+            height: calc(100vh - 60px - 60px); /* Высота контента с учетом navbar и отступа сверху */
         }
 
         /* Профиль пользователя */
@@ -304,6 +304,25 @@
         .navbar {
             padding-bottom: env(safe-area-inset-bottom);
         }
+
+        /* История загрузок */
+        .history-item {
+            background-color: #1E1E1E;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .history-item h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .history-item p {
+            margin: 5px 0;
+            color: #AAAAAA;
+            font-size: 14px;
+        }
     </style>
 
     <!-- Инициализация Telegram Web App -->
@@ -329,6 +348,7 @@
         <div class="navbar">
             <button class="nav-button active" id="nav-home">Главная</button>
             <button class="nav-button" id="nav-tariffs">Тарифы</button>
+            <button class="nav-button" id="nav-history">История</button>
             <button class="nav-button" id="nav-profile">Профиль</button>
             <button class="nav-button" id="nav-settings">Настройки</button>
         </div>
@@ -371,7 +391,7 @@
                 tg.expand();
                 tg.requestFullscreen();
 
-                // Получаем элементы DOM
+                //Получаем элементы DOM
                 const loader = document.getElementById('loader');
                 const app = document.getElementById('app');
                 const appContent = document.getElementById('app-content');
@@ -401,12 +421,15 @@
                 }
 
                 // Настройки пользователя
-                let isHighlightEnabled = true; // Подсветка включена по умолчанию
+                let isHighlightEnabled = localStorage.getItem('isHighlightEnabled') === 'false' ? false : true;
 
                 // Данные о тарифе пользователя
                 let userBalance = 0; // Получить из бота через API
                 let userStatus = 'Неактивен';
                 let userTariff = '—';
+
+                // История загрузок пользователя
+                let downloadHistory = []; // Получить из бота через API
 
                 // Функция обновления информации о тарифе
                 function updateTariffInfo() {
@@ -417,6 +440,17 @@
                         userStatus = 'Неактивен';
                         userTariff = '—';
                     }
+                }
+
+                // Функция для обновления истории загрузок
+                function updateDownloadHistory() {
+                    // Здесь вы можете сделать запрос к боту или серверу для получения истории
+                    // Для примера используем статический массив
+                    downloadHistory = [
+                        {title: 'Видео 1', date: '2023-10-01'},
+                        {title: 'Видео 2', date: '2023-10-02'},
+                        {title: 'Видео 3', date: '2023-10-03'},
+                    ];
                 }
 
                 // Функция перехода на страницу
@@ -441,7 +475,10 @@
                         case 'nav-tariffs':
                             renderTariffsPage();
                             break;
-                        case 'nav-profile':
+                        case 'nav-history':
+                            renderHistoryPage();
+                            break;
+                            case 'nav-profile':
                             renderProfilePage();
                             break;
                         case 'nav-settings':
@@ -550,7 +587,8 @@
                             name: 'Бизнес VIP',
                             description: 'Для скачивания доступно более 3000 видео',
                             price: 'По договоренности',
-                            image: '',action: 'Связаться'
+                            image: '',
+                            action: 'Связаться'
                         }
                     ];
 
@@ -598,7 +636,7 @@
                                 tg.sendData(JSON.stringify({action: 'contact_manager'}));
                             } else {
                                 // Перейти к оплате через Юкассу
-                                tg.sendData(JSON.stringify({action: 'pay', tariff: tariff.name}));
+                                startPayment(tariff);
                             }
                         });
                         actionDiv.appendChild(button);
@@ -609,6 +647,69 @@
                     });
 
                     appContent.appendChild(tariffsDiv);
+                }
+
+                // Функция для инициации платежа через Юкасса
+                function startPayment(tariff) {
+                    // Здесь вы можете интегрировать платеж через Юкасса, используя Shop ID
+                    // Например, открываем форму оплаты в новом окне или фрейме
+
+                    // Создаем объект данных для передачи в бота
+                    const paymentData = {
+                        action: 'pay',
+                        tariff: tariff.name,
+                        amount: tariff.price.replace('₽', ''),
+                        userId: tg.initDataUnsafe.user.id
+                    };
+
+                    // Отправляем данные боту
+                    tg.sendData(JSON.stringify(paymentData));
+
+                    // После успешной оплаты обновляем информацию о тарифе
+                    // Здесь вы можете обновить баланс, запросив данные у бота
+                    // Для примера увеличим баланс на значение тарифа
+                    userBalance += parseInt(tariff.description.match(/\d+/)[0]);
+
+                    // Обновляем данные на странице
+                    updateTariffInfo();
+                    navigateTo('nav-home');
+                }
+
+                // Функция рендеринга страницы "История"
+                function renderHistoryPage() {
+                    updateDownloadHistory();
+
+                    const historyDiv = document.createElement('div');
+                    historyDiv.style.padding = '20px';
+                    historyDiv.style.paddingTop = '60px';
+
+                    const title = document.createElement('h2');
+                    title.textContent = 'История загрузок';
+                    title.style.marginBottom = '20px';
+                    historyDiv.appendChild(title);
+
+                    if (downloadHistory.length === 0) {
+                        const emptyMessage = document.createElement('p');
+                        emptyMessage.textContent = 'Вы еще не скачивали видео.';
+                        historyDiv.appendChild(emptyMessage);
+                    } else {
+                        downloadHistory.forEach(item => {
+                            const historyItem = document.createElement('div');
+                            historyItem.className = 'history-item';
+
+                            const itemTitle = document.createElement('h3');
+                            itemTitle.textContent = item.title;
+                            historyItem.appendChild(itemTitle);
+
+                            const itemDate = document.createElement('p');
+                            itemDate.textContent = `Дата: ${item.date}`;
+                            historyItem.appendChild(itemDate);
+
+                            historyDiv.appendChild(historyItem);
+                        });
+                    }
+
+                    appContent.appendChild(historyDiv);
                 }
 
                 // Функция рендеринга страницы "Профиль"
@@ -670,6 +771,7 @@
                     switchInput.checked = isHighlightEnabled;
                     switchInput.addEventListener('change', () => {
                         isHighlightEnabled = switchInput.checked;
+                        localStorage.setItem('isHighlightEnabled', isHighlightEnabled);
                         toggleHighlight();
                     });
 
@@ -683,6 +785,23 @@
                     highlightSetting.appendChild(switchLabel);
 
                     settingsDiv.appendChild(highlightSetting);
+
+                    // Добавляем плашку "Поддержка"
+                    const supportSetting = document.createElement('div');
+                    supportSetting.className = 'settings-item';
+                    supportSetting.style.cursor = 'pointer';
+
+                    const supportLabel = document.createElement('span');
+                    supportLabel.textContent = 'Поддержка';
+
+                    supportSetting.appendChild(supportLabel);
+
+                    // Добавляем обработчик события для открытия чата с менеджером
+                    supportSetting.addEventListener('click', () => {
+                        tg.sendData(JSON.stringify({action: 'contact_manager'}));
+                    });
+
+                    settingsDiv.appendChild(supportSetting);
 
                     appContent.appendChild(settingsDiv);
                 }
