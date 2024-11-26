@@ -6,69 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Подключение стилей -->
     <style>
-        /* Общие переменные цветовой темы */
-        :root {
-            --background-color: #f0f0f0;
-            --text-color: #333;
-            --accent-color: #007bff;
-            --highlight-color: #007bff;
-        }
-
-        /* Темная тема */
-        [data-theme="dark"] {
-            --background-color: #0B0C10;
-            --text-color: #C5C6C7;
-            --accent-color: #66FCF1;
-            --highlight-color: #66FCF1;
-        }
-
-        /* Светлая тема */
-        [data-theme="light"] {
-            --background-color: #f0f0f0;
-            --text-color: #333;
-            --accent-color: #007bff;
-            --highlight-color: #007bff;
-        }
-
         /* Общие стили */
         body, html {
             margin: 0;
             padding: 0;
             font-family: 'Arial', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
+            background-color: #121212;
+            color: #FFFFFF;
             overflow: hidden;
             height: 100vh;
         }
 
         /* Скрытый контент до загрузки */
         .hidden {
-            display: none;
+            display: flex;
         }
 
         /* Анимация загрузки */
-        #loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--background-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .spinner {
-            border: 8px solid var(--text-color);
-            border-top: 8px solid var(--accent-color);
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-        }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -80,30 +34,18 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 5px;
-            background: var(--highlight-color);
-            background-size: 600% 100%;
-            animation: gradientAnimation 10s ease infinite;
+            height: 20px;
+            box-shadow: 0px 0px 30px 10px transparent;
+            animation: gradientGlow 15s ease-in-out infinite;
             z-index: 1;
         }
 
-        /* Цвета для подсветки */
-        .highlight-red {
-            --highlight-color: #ff4d4d;
-        }
-
-        .highlight-green {
-            --highlight-color: #28a745;
-        }
-
-        .highlight-blue {
-            --highlight-color: #007bff;
-        }
-
-        @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        @keyframes gradientGlow {
+            0% { box-shadow: 0px 0px 30px 10px #FF3B30; }
+            25% { box-shadow: 0px 0px 30px 10px #1DB954; }
+            50% { box-shadow: 0px 0px 30px 10px #1E90FF; }
+            75% { box-shadow: 0px 0px 30px 10px #FFA500; }
+            100% { box-shadow: 0px 0px 30px 10px #FF69B4; }
         }
 
         /* Главный контент */
@@ -125,12 +67,12 @@
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background-color: var(--accent-color);
+            background-color: #1DB954;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 36px;
-            color: #FFF;
+            color: #FFFFFF;
             margin-right: 15px;
             overflow: hidden;
         }
@@ -142,50 +84,39 @@
 
         .user-info h2, .user-info p {
             margin: 0;
-            color: var(--text-color);
         }
 
         /* Остаток по тарифу */
         .balance-section {
             text-align: center;
             margin-top: 30px;
-            color: var(--text-color);
         }
 
         #no-tariff-banner {
-            background-color: var(--accent-color);
-            padding: 15px;
+            background-color: #FF3B30;
+            padding: 10px;
             border-radius: 8px;
             margin-bottom: 20px;
             cursor: pointer;
-            color: #FFF;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-
-        #no-tariff-banner:hover {
-            background-color: var(--highlight-color);
         }
 
         #balance-info h1 {
             font-size: 48px;
             margin: 0;
-            color: var(--highlight-color);
         }
 
         #balance-info p {
             margin: 5px 0;
-            font-size: 18px;
         }
 
         /* Статус */
         #status {
-            color: var(--text-color);
+            color: #FF3B30; /* Красный по умолчанию (Неактивен) */
             font-weight: bold;
         }
 
         #status.active {
-            color: var(--highlight-color);
+            color: #4CD964; /* Зеленый (Активен) */
         }
 
         /* Навигационная панель */
@@ -194,44 +125,39 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: var(--background-color);
+            background-color: #1E1E1E;
             display: flex;
             justify-content: space-around;
             padding: 10px 0;
-            border-top: 1px solid var(--accent-color);
         }
 
         .nav-button {
             background: none;
             border: none;
-            color: var(--text-color);
+            color: #FFFFFF;
             font-size: 16px;
             flex-grow: 1;
             padding: 10px 0;
             cursor: pointer;
-            transition: color 0.3s;
             position: relative;
         }
 
         .nav-button.active {
-            border-top: 2px solid var(--highlight-color);
-            color: var(--highlight-color);
+            border-top: 2px solid #1DB954;
+            color: #1DB954;
         }
 
-        .nav-button:hover {
-            color: var(--highlight-color);
-        }
-
-        /* Индикатор уведомлений на навигационной кнопке */
-        .nav-button .notification-badge {
-            position: absolute;
-            top: 5px;
-            right: 30%;
+        .notification-counter {
+            display: inline-block;
             background-color: red;
             color: white;
+            border-radius: 10px;
             padding: 2px 6px;
-            border-radius: 50%;
             font-size: 12px;
+            margin-left: 5px;
+            position: absolute;
+            top: 5px;
+            right: 15px;
         }
 
         /* Переключатель */
@@ -273,7 +199,7 @@
         }
 
         input:checked + .slider {
-            background-color: var(--highlight-color);
+            background-color: #4CD964;
         }
 
         input:checked + .slider:before {
@@ -291,28 +217,8 @@
             justify-content: space-between;
             align-items: center;
             margin: 15px 0;
-            border-bottom: 1px solid var(--accent-color);
-            padding-bottom: 10px;
-            color: var(--text-color);
             cursor: pointer;
             position: relative;
-        }
-
-        .settings-item:hover {
-            color: var(--highlight-color);
-        }
-
-        /* Счётчик уведомлений в настройках */
-        .settings-item .notification-count {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: red;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 50%;
-            font-size: 12px;
         }
 
         /* Кнопка "Назад" */
@@ -322,7 +228,7 @@
             left: 20px;
             background: none;
             border: none;
-            color: var(--highlight-color);
+            color: #FFFFFF;
             font-size: 24px;
             cursor: pointer;
             z-index: 2;
@@ -330,31 +236,27 @@
 
         /* Секция тарифов */
         .tariff-card {
-            background-color: var(--background-color);
-            border: 1px solid var(--accent-color);
+            background-color: #1E1E1E;
             border-radius: 10px;
             padding: 15px;
             display: flex;
             align-items: center;
             margin-bottom: 15px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
 
         .tariff-card:hover {
-            background-color: var(--accent-color);
-            color: #FFF;
+            background-color: #2A2A2A;
         }
 
         .tariff-image {
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background-color: #FFF;
+            background-color: #333333;
             margin-right: 15px;
             flex-shrink: 0;
             overflow: hidden;
-            border: 2px solid var(--highlight-color);
         }
 
         .tariff-image img {
@@ -365,7 +267,6 @@
 
         .tariff-info {
             flex-grow: 1;
-            color: var(--text-color);
         }
 
         .tariff-info h3 {
@@ -375,15 +276,13 @@
 
         .tariff-info p {
             margin: 5px 0;
-            color: var(--text-color);
-            font-size: 14px;
+            color: #AAAAAA;
         }
 
         .tariff-price {
             font-size: 16px;
             font-weight: bold;
             margin-top: 10px;
-            color: var(--highlight-color);
         }
 
         .tariff-action {
@@ -392,27 +291,25 @@
 
         .tariff-button {
             padding: 10px 15px;
-            background-color: var(--highlight-color);
+            background-color: #1DB954;
             border: none;
             border-radius: 5px;
-            color: #FFF;
+            color: #FFFFFF;
             cursor: pointer;
             transition: background-color 0.3s;
-            font-weight: bold;
         }
 
         .tariff-button:hover {
-            background-color: var(--accent-color);
+            background-color: #17A44A;
         }
 
         .tariff-button:active {
-            background-color: var(--background-color);
+            background-color: #14803D;
         }
 
         /* Дополнительные стили */
         h2, h1 {
             margin: 0;
-            color: var(--text-color);
         }
 
         /* Обеспечение безопасной зоны */
@@ -426,18 +323,10 @@
 
         /* История загрузок */
         .history-item {
-            background-color: var(--background-color);
-            border: 1px solid var(--accent-color);
+            background-color: #1E1E1E;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 15px;
-            color: var(--text-color);
-            transition: background-color 0.3s;
-        }
-
-        .history-item:hover {
-            background-color: var(--accent-color);
-            color: #FFF;
         }
 
         .history-item h3 {
@@ -447,54 +336,77 @@
 
         .history-item p {
             margin: 5px 0;
-            color: var(--text-color);
+            color: #AAAAAA;
             font-size: 14px;
         }
 
-        /* Стили для кнопок связаться */
-        .contact-button {
-            padding: 10px 15px;
-            background-color: var(--highlight-color);
-            border: none;
-            border-radius: 5px;
-            color: #FFF;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-weight: bold;
-        }
-
-        .contact-button:hover {
-            background-color: var(--accent-color);
-        }
-
-        /* Стили для уведомлений */
-        #notification-banner {
-            position: fixed;
-            top: -100px;
-            left: 10px;
-            right: 10px;
-            background-color: var(--accent-color);
-            color: #FFF;
-            padding: 15px;
+        /* Уведомление */
+        .notification-banner {
+            position: absolute;
+            top: 10%;
+            left: 5%;
+            right: 5%;
+            background-color: #1E1E1E;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: top 0.5s ease;
-            z-index: 999;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateY(-100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
         }
 
-        #notification-banner.show {
-            top: 10px;
+        .notification-banner.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        #notification-banner .dismiss-button {
-            background: none;
-            border: none;
-            color: #FFF;
-            font-size: 18px;
+        .notification-banner p {
+            margin: 5px 0;
+        }
+
+        .notification-accept-button {
+            color: #1DB954;
+            font-weight: bold;
             cursor: pointer;
+            float: right;
+        }
+
+        /* Страница уведомлений */
+        .notifications-list {
+            padding: 20px;
+            padding-top: 60px;
+        }
+
+        .notification-item {
+            background-color: #1E1E1E;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-item h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .notification-item p {
+            margin: 5px 0;
+            color: #AAAAAA;
+            font-size: 14px;
+        }
+
+        .unread-indicator {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background-color: red;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 12px;
         }
     </style>
 
@@ -507,14 +419,8 @@
         <div class="spinner"></div>
     </div>
 
-    <!-- Уведомление -->
-    <div id="notification-banner">
-        <div id="notification-text"></div>
-        <button class="dismiss-button">×</button>
-    </div>
-
     <!-- Основной контент -->
-    <div id="app" class="hidden" data-theme="light">
+    <div id="app" class="hidden">
         <!-- Плавная подсветка (градиент) -->
         <div id="gradient"></div>
 
@@ -535,696 +441,683 @@
 
     <!-- Скрипт для логики приложения -->
     <script>
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', () => {
-            // Проверка наличия Telegram Web App или создание заглушки для тестирования в браузере
-            let tg = window.Telegram ? window.Telegram.WebApp : null;
 
-            if (!tg) {
-                // Заглушка для тестирования в браузере
-                tg = {
-                    initDataUnsafe: {
-                        user: {
-                            id: 123456,
-                            first_name: 'Тест',
-                            last_name: 'Пользователь',
-                            username: 'testuser',
-                            photo_url: ''
-                        }
-                    },
-                    expand: function() {},
-                    requestFullscreen: function() {},
-                    onEvent: function() {},
-                    safeAreaInset: {top: 0, bottom: 0},
-                    isActive: true,
-                    isFullscreen: true,
-                    sendData: function(data) {
-                        console.log('Отправка данных боту:', data);
-                    }
-                };
-                console.warn('Telegram WebApp не найден. Используется заглушка для тестирования.');
+// Инициализация
+document.addEventListener('DOMContentLoaded', () => {
+    // Проверка наличия Telegram Web App или создание заглушки для тестирования в браузере
+    let tg = window.Telegram ? window.Telegram.WebApp : null;
+
+    if (!tg) {
+        // Заглушка для тестирования в браузере
+        tg = {
+            initDataUnsafe: {
+                user: {
+                    first_name: 'Тест',
+                    last_name: 'Пользователь',
+                    username: 'testuser',
+                    photo_url: ''
+                }
+            },
+            expand: function() {},
+            requestFullscreen: function() {},
+            onEvent: function() {},
+            safeAreaInset: {top: 0, bottom: 0},
+            isActive: true,
+            isFullscreen: true,
+            sendData: function(data) {
+                console.log('Отправка данных боту:', data);
             }
-
-            // Константа с юзернеймом менеджера
-            const managerUsername = 'MWII_boss'; // Замените на юзернейм вашего менеджера без @
-
-            // Оборачивание кода в try...catch для отлова ошибок
-            try {
-                // Устанавливаем полноэкранный режим
-                tg.expand();
-                tg.requestFullscreen();
-
-                // Получаем элементы DOM
-                const loader = document.getElementById('loader');
-                const app = document.getElementById('app');
-                const appContent = document.getElementById('app-content');
-                const gradientElem = document.getElementById('gradient');
-
-                // Навигационные кнопки
-                const navButtons = document.querySelectorAll('.nav-button');
-                navButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        navButtons.forEach(btn => btn.classList.remove('active'));
-                        button.classList.add('active');
-                        navigateTo(button.id);
-                    });
-                });
-
-                // Данные пользователя
-                const initData = tg.initDataUnsafe.user;
-                let userFirstName = 'Имя';
-                let userLastName = '';
-                let username = '';
-                let userPhoto = '';
-                let userId = initData.id || 0;
-
-                if (initData) {
-                    userFirstName = initData.first_name || '';
-                    userLastName = initData.last_name || '';
-                    username = initData.username ? '@' + initData.username : '';
-                    userPhoto = initData.photo_url || '';
-                }
-
-                // Настройки пользователя
-                let isHighlightEnabled = localStorage.getItem('isHighlightEnabled') === 'false' ? false : true;
-                let selectedTheme = localStorage.getItem('selectedTheme') || 'light';
-                let selectedHighlightColor = localStorage.getItem('selectedHighlightColor') || 'highlight-blue';
-
-                // Данные о тарифе пользователя
-                let userBalance = 0; // Получить из бота через API
-                let userStatus = 'Неактивен';
-                let userTariff = '—';
-
-                // История загрузок пользователя
-                let downloadHistory = []; // Получить из бота через API
-
-                // Уведомления пользователя
-                let notifications = [];
-                let unreadNotifications = 0;
-
-                // Функция обновления информации о тарифе
-                function updateTariffInfo() {if (userBalance > 0) {
-                        userStatus = 'Активен';
-                        userTariff = 'Ваш тариф';
-                    } else {
-                        userStatus = 'Неактивен';
-                        userTariff = '—';
-                    }
-                }
-
-                // Функция для обновления истории загрузок
-                function updateDownloadHistory() {
-                    // Здесь вы можете сделать запрос к боту или серверу для получения истории
-                    // Для примера используем статический массив
-                    downloadHistory = [
-                        {title: 'Видео 1', date: '2023-10-01'},
-                        {title: 'Видео 2', date: '2023-10-02'},
-                        {title: 'Видео 3', date: '2023-10-03'},
-                    ];
-                }
-
-                // Функция перехода на страницу
-                function navigateTo(pageId) {
-                    appContent.innerHTML = ''; // Очищаем контент
-
-                    // Убираем индикатор уведомлений при переходе в настройки
-                    if (pageId === 'nav-settings') {
-                        unreadNotifications = 0;
-                        updateNavNotificationBadge();
-                    }
-
-                    // Добавляем кнопку "Назад" для страниц кроме главной
-                    if (pageId !== 'nav-home') {
-                        const backButton = document.createElement('button');
-                        backButton.className = 'back-button';
-                        backButton.innerHTML = '←';
-                        backButton.addEventListener('click', () => {
-                            document.getElementById('nav-home').click();
-                        });
-                        appContent.appendChild(backButton);
-                    }
-
-                    switch(pageId) {
-                        case 'nav-home':
-                            renderHomePage();
-                            break;
-                        case 'nav-tariffs':
-                            renderTariffsPage();
-                            break;
-                        case 'nav-history':
-                            renderHistoryPage();
-                            break;
-                        case 'nav-profile':
-                            renderProfilePage();
-                            break;
-                        case 'nav-settings':
-                            renderSettingsPage();
-                            break;
-                        default:
-                            renderHomePage();
-                    }
-                }
-
-                // Функция рендеринга главной страницы
-                function renderHomePage() {
-                    updateTariffInfo();
-
-                    // Остаток по тарифу
-                    const balanceSection = document.createElement('div');
-                    balanceSection.className = 'balance-section';
-
-                    // Плашка при отсутствии тарифа
-                    if (userBalance === 0) {
-                        const noTariffBanner = document.createElement('div');
-                        noTariffBanner.id = 'no-tariff-banner';
-                        noTariffBanner.innerHTML = 'У вас не оформлен тариф. Перейдите в раздел <strong>"Тарифы"</strong>.';
-                        noTariffBanner.addEventListener('click', () => {
-                            document.getElementById('nav-tariffs').click();
-                        });
-                        balanceSection.appendChild(noTariffBanner);
-                    }
-
-                    // Информация о балансе
-                    const balanceInfo = document.createElement('div');
-                    balanceInfo.id = 'balance-info';
-
-                    const balanceElem = document.createElement('h1');
-                    balanceElem.id = 'balance';
-                    balanceElem.textContent = `${userBalance} видео`;
-                    balanceInfo.appendChild(balanceElem);
-
-                    const statusElem = document.createElement('p');
-                    statusElem.id = 'status';
-                    statusElem.textContent = userStatus;
-                    if (userStatus === 'Активен') {
-                        statusElem.classList.add('active');
-                    }
-                    balanceInfo.appendChild(statusElem);
-
-                    const tariffNameElem = document.createElement('p');
-                    tariffNameElem.id = 'tariff-name';
-                    tariffNameElem.textContent = `Тариф: ${userTariff}`;
-                    balanceInfo.appendChild(tariffNameElem);
-
-                    balanceSection.appendChild(balanceInfo);
-
-                    appContent.appendChild(balanceSection);
-                }
-
-                // Функция рендеринга страницы "Тарифы"
-                function renderTariffsPage() {
-                    const tariffsDiv = document.createElement('div');
-                    tariffsDiv.style.padding = '20px';
-                    tariffsDiv.style.paddingTop = '60px';
-
-                    const title = document.createElement('h2');
-                    title.textContent = 'Тарифы';
-                    title.style.marginBottom = '20px';
-                    tariffsDiv.appendChild(title);
-
-                    // Массив тарифов
-                    const tariffs = [
-                        {
-                            name: 'Пробный',
-                            description: 'Для скачивания доступно 100 видео',
-                            price: '399₽',
-                            image: '', // Добавьте ссылки на изображения тарифов
-                            action: 'Оформить',
-                            videos: 100
-                        },
-                        {
-                            name: 'Новичок',
-                            description: 'Для скачивания доступно 500 видео',
-                            price: '1799₽',
-                            image: '',
-                            action: 'Оформить',
-                            videos: 500
-                        },
-                        {
-                            name: 'Любитель',
-                            description: 'Для скачивания доступно 1000 видео',
-                            price: '2999₽',
-                            image: '',
-                            action: 'Оформить',
-                            videos: 1000
-                        },
-                        {
-                            name: 'Профи',
-                            description: 'Для скачивания доступно 2000 видео',
-                            price: '5499₽',
-                            image: '',
-                            action: 'Оформить',
-                            videos: 2000
-                        },
-                        {
-                            name: 'Бизнес',
-                            description: 'Для скачивания доступно 3000 видео',
-                            price: '6999₽',
-                            image: '',
-                            action: 'Оформить',
-                            videos: 3000
-                        },
-                        {
-                            name: 'Бизнес VIP',
-                            description: 'Для скачивания доступно более 3000 видео',
-                            price: 'По договоренности',
-                            image: '',
-                            action: 'Связаться',
-                            videos: 'Более 3000'
-                        }
-                    ];
-
-                    tariffs.forEach(tariff => {
-                        const card = document.createElement('div');
-                        card.className = 'tariff-card';
-
-                        const image = document.createElement('div');
-                        image.className = 'tariff-image';
-                        // Если есть картинка, установить как фон
-                        if (tariff.image) {
-                            const img = document.createElement('img');
-                            img.src = tariff.image;
-                            image.appendChild(img);
-                        }
-                        card.appendChild(image);
-
-                        const info = document.createElement('div');
-                        info.className = 'tariff-info';
-                        const name = document.createElement('h3');
-                        name.textContent = tariff.name;
-                        info.appendChild(name);
-
-                        const description = document.createElement('p');
-                        description.textContent = tariff.description;
-                        info.appendChild(description);
-
-                        const price = document.createElement('div');
-                        price.className = 'tariff-price';
-                        price.textContent = tariff.price;
-                        info.appendChild(price);
-
-                        card.appendChild(info);
-
-                        const actionDiv = document.createElement('div');
-                        actionDiv.className = 'tariff-action';
-
-                        const button = document.createElement('button');
-                        button.className = tariff.action === 'Связаться' ? 'contact-button' : 'tariff-button';
-                        button.textContent = tariff.action;
-                        button.addEventListener('click', () => {
-                            if (tariff.action === 'Связаться') {
-                                // Открыть чат с менеджером
-                                openTelegramChat(managerUsername);
-                            } else {
-                                // Активация тарифа без оплаты
-                                activateTariff(tariff);
-                            }
-                        });
-                        actionDiv.appendChild(button);
-
-                        card.appendChild(actionDiv);
-
-                        tariffsDiv.appendChild(card);
-                    });
-
-                    appContent.appendChild(tariffsDiv);
-                }
-
-                // Функция активации тарифа
-                function activateTariff(tariff) {
-                    userBalance += tariff.videos === 'Более 3000' ? 3000 : tariff.videos;
-                    userTariff = tariff.name;
-                    updateTariffInfo();
-                    saveNotification(`Вы оформили тариф "${tariff.name}", доступно для скачивания ${tariff.videos} видео.`);
-                    showNotification(`Вы оформили тариф "${tariff.name}", доступно для скачивания ${tariff.videos} видео.`);
-                    navigateTo('nav-home');
-                }
-
-                // Функция сохранения уведомления
-                function saveNotification(text) {
-                    notifications.push({
-                        text: text,
-                        date: new Date(),
-                        read: false
-                    });
-                    unreadNotifications++;
-                    updateNavNotificationBadge();
-                }
-
-                // Функция отображения уведомления
-                function showNotification(text) {
-                    const banner = document.getElementById('notification-banner');
-                    const notificationText = document.getElementById('notification-text');
-                    notificationText.textContent = text;
-                    banner.classList.add('show');
-
-                    const dismissButton = banner.querySelector('.dismiss-button');
-                    dismissButton.addEventListener('click', () => {
-                        banner.classList.remove('show');
-                    });
-
-                    setTimeout(() => {
-                        banner.classList.remove('show');}, 5000);
-                }
-
-                // Функция обновления индикатора уведомлений на навигационной панели
-                function updateNavNotificationBadge() {
-                    const settingsButton = document.getElementById('nav-settings');
-                    const existingBadge = settingsButton.querySelector('.notification-badge');
-                    if (unreadNotifications > 0) {
-                        if (!existingBadge) {
-                            const badge = document.createElement('div');
-                            badge.className = 'notification-badge';
-                            badge.textContent = unreadNotifications;
-                            settingsButton.appendChild(badge);
-                        } else {
-                            existingBadge.textContent = unreadNotifications;
-                        }
-                    } else {
-                        if (existingBadge) {
-                            existingBadge.remove();
-                        }
-                    }
-                }
-
-                // Функция открытия чата с менеджером
-                function openTelegramChat(username) {
-                    if (tg.initDataUnsafe.user) {
-                        window.location.href = `https://t.me/mwii_boss`;
-                    } else {
-                        alert('Не удалось открыть чат с менеджером.');
-                    }
-                }
-
-                // Функция рендеринга страницы "История"
-                function renderHistoryPage() {
-                    updateDownloadHistory();
-
-                    const historyDiv = document.createElement('div');
-                    historyDiv.style.padding = '20px';
-                    historyDiv.style.paddingTop = '60px';
-
-                    const title = document.createElement('h2');
-                    title.textContent = 'История загрузок';
-                    title.style.marginBottom = '20px';
-                    historyDiv.appendChild(title);
-
-                    if (downloadHistory.length === 0) {
-                        const emptyMessage = document.createElement('p');
-                        emptyMessage.textContent = 'Вы еще не скачивали видео.';
-                        emptyMessage.style.color = '#C5C6C7';
-                        historyDiv.appendChild(emptyMessage);
-                    } else {
-                        downloadHistory.forEach(item => {
-                            const historyItem = document.createElement('div');
-                            historyItem.className = 'history-item';
-
-                            const itemTitle = document.createElement('h3');
-                            itemTitle.textContent = item.title;
-                            historyItem.appendChild(itemTitle);
-
-                            const itemDate = document.createElement('p');
-                            itemDate.textContent = `Дата: ${item.date}`;
-                            historyItem.appendChild(itemDate);
-
-                            historyDiv.appendChild(historyItem);
-                        });
-                    }
-
-                    appContent.appendChild(historyDiv);
-                }
-
-                // Функция рендеринга страницы "Профиль"
-                function renderProfilePage() {
-                    const profileDiv = document.createElement('div');
-                    profileDiv.style.padding = '20px';
-                    profileDiv.style.paddingTop = '60px';
-
-                    const profileSection = document.createElement('div');
-                    profileSection.className = 'profile';
-
-                    const avatarElem = document.createElement('div');
-                    avatarElem.className = 'avatar';
-
-                    if (userPhoto) {
-                        const img = document.createElement('img');
-                        img.src = userPhoto;
-                        avatarElem.appendChild(img);
-                    } else {
-                        avatarElem.textContent = userFirstName.charAt(0).toUpperCase();
-                    }
-
-                    profileSection.appendChild(avatarElem);
-
-                    const userInfoDiv = document.createElement('div');
-                    userInfoDiv.className = 'user-info';
-
-                    const nameElem = document.createElement('h2');
-                    nameElem.textContent = `${userFirstName} ${userLastName}`.trim();
-                    userInfoDiv.appendChild(nameElem);
-
-                    const usernameElem = document.createElement('p');
-                    usernameElem.textContent = username;
-                    userInfoDiv.appendChild(usernameElem);
-
-                    profileSection.appendChild(userInfoDiv);
-
-                    profileDiv.appendChild(profileSection);
-
-                    appContent.appendChild(profileDiv);
-                }
-
-                // Функция рендеринга страницы "Настройки"
-                function renderSettingsPage() {
-                    const settingsDiv = document.createElement('div');
-                    settingsDiv.className = 'settings';
-
-                    // Уведомления
-                    const notificationsSetting = document.createElement('div');
-                    notificationsSetting.className = 'settings-item';
-
-                    const notificationsLabel = document.createElement('span');
-                    notificationsLabel.textContent = 'Уведомления';
-
-                    if (unreadNotifications > 0) {
-                        const notificationCount = document.createElement('div');
-                        notificationCount.className = 'notification-count';
-                        notificationCount.textContent = unreadNotifications;
-                        notificationsSetting.appendChild(notificationCount);
-                    }
-
-                    notificationsSetting.addEventListener('click', () => {
-                        renderNotificationsPage();
-                    });
-
-                    notificationsSetting.appendChild(notificationsLabel);
-                    settingsDiv.appendChild(notificationsSetting);
-
-                    // Подсветка
-                    const highlightSetting = document.createElement('div');
-                    highlightSetting.className = 'settings-item';
-
-                    const settingLabel = document.createElement('span');
-                    settingLabel.textContent = 'Подсветка';
-
-                    const switchLabel = document.createElement('label');
-                    switchLabel.className = 'switch';
-
-                    const switchInput = document.createElement('input');
-                    switchInput.type = 'checkbox';
-                    switchInput.checked = isHighlightEnabled;
-                    switchInput.addEventListener('change', () => {
-                        isHighlightEnabled = switchInput.checked;
-                        localStorage.setItem('isHighlightEnabled', isHighlightEnabled);
-                        toggleHighlight();
-                    });
-
-                    const switchSlider = document.createElement('span');
-                    switchSlider.className = 'slider';
-
-                    switchLabel.appendChild(switchInput);
-                    switchLabel.appendChild(switchSlider);
-
-                    highlightSetting.appendChild(settingLabel);
-                    highlightSetting.appendChild(switchLabel);
-
-                    settingsDiv.appendChild(highlightSetting);
-
-                    // Выбор цвета подсветки
-                    if (isHighlightEnabled) {
-                        const highlightColorSetting = document.createElement('div');
-                        highlightColorSetting.className = 'settings-item';
-
-                        const colorLabel = document.createElement('span');
-                        colorLabel.textContent = 'Цвет подсветки';
-
-                        const colorSelect = document.createElement('select');
-                        colorSelect.innerHTML = `
-                            <option value="highlight-red">Красный</option>
-                            <option value="highlight-green">Зеленый</option>
-                            <option value="highlight-blue">Синий</option>
-                        `;
-                        colorSelect.value = selectedHighlightColor;
-                        colorSelect.addEventListener('change', () => {
-                            selectedHighlightColor = colorSelect.value;
-                            localStorage.setItem('selectedHighlightColor', selectedHighlightColor);
-                            updateHighlightColor();
-                        });
-
-                        highlightColorSetting.appendChild(colorLabel);
-                        highlightColorSetting.appendChild(colorSelect);
-
-                        settingsDiv.appendChild(highlightColorSetting);
-                    }
-
-                    // Темы
-                    const themeSetting = document.createElement('div');
-                    themeSetting.className = 'settings-item';
-
-                    const themeLabel = document.createElement('span');
-                    themeLabel.textContent = 'Тема';
-
-                    const themeSelect = document.createElement('select');
-                    themeSelect.innerHTML = `
-                        <option value="light">Светлая</option>
-                        <option value="dark">Темная</option>
-                    `;
-                    themeSelect.value = selectedTheme;
-                    themeSelect.addEventListener('change', () => {
-                        selectedTheme = themeSelect.value;
-                        localStorage.setItem('selectedTheme', selectedTheme);
-                        updateTheme();
-                    });
-
-                    themeSetting.appendChild(themeLabel);
-                    themeSetting.appendChild(themeSelect);
-
-                    settingsDiv.appendChild(themeSetting);
-
-                    // Поддержка
-                    const supportSetting = document.createElement('div');
-                    supportSetting.className = 'settings-item';
-                    supportSetting.style.cursor = 'pointer';
-
-                    const supportLabel = document.createElement('span');
-                    supportLabel.textContent = 'Поддержка';
-
-                    supportSetting.appendChild(supportLabel);
-
-                    // Добавляем обработчик события для открытия чата с менеджером
-                    supportSetting.addEventListener('click', () => {
-                        openTelegramChat(managerUsername);
-                    });
-
-                    settingsDiv.appendChild(supportSetting);
-
-                    appContent.appendChild(settingsDiv);
-                }
-
-                // Функция переключения подсветки
-                function toggleHighlight() {
-                    if (isHighlightEnabled) {
-                        gradientElem.style.display = 'block';
-                        updateHighlightColor();
-                    } else {
-                        gradientElem.style.display = 'none';
-                    }
-                    // Перерисовываем страницу настроек
-                    renderSettingsPage();
-                }
-
-                // Функция обновления цвета подсветки
-                function updateHighlightColor() {
-                    gradientElem.className = '';
-                    gradientElem.classList.add(selectedHighlightColor);
-                }
-
-                // Функция обновления темы
-                function updateTheme() {
-                    app.setAttribute('data-theme', selectedTheme);
-                }
-
-                // Функция рендеринга страницы уведомлений
-                function renderNotificationsPage() {
-                    appContent.innerHTML = ''; // Очищаем контент
-
-                    const backButton = document.createElement('button');
-                    backButton.className = 'back-button';
-                    backButton.innerHTML = '←';
-                    backButton.addEventListener('click', () => {
-                        navigateTo('nav-settings');
-                    });
-                    appContent.appendChild(backButton);
-
-                    const notificationsDiv = document.createElement('div');
-                    notificationsDiv.style.padding = '20px';
-                    notificationsDiv.style.paddingTop = '60px';
-
-                    const title = document.createElement('h2');
-                    title.textContent = 'Уведомления';
-                    title.style.marginBottom = '20px';
-                    notificationsDiv.appendChild(title);
-
-                    if (notifications.length === 0) {
-                        const emptyMessage = document.createElement('p');
-                        emptyMessage.textContent = 'У вас нет уведомлений.';
-                        emptyMessage.style.color = '#C5C6C7';
-                        notificationsDiv.appendChild(emptyMessage);
-                    } else {
-                        notifications.forEach(notification => {
-                            const notificationItem = document.createElement('div');
-                            notificationItem.className = 'history-item';
-
-                            const notificationText = document.createElement('h3');
-                            notificationText.textContent = notification.text;
-                            notificationItem.appendChild(notificationText);
-
-                            const notificationDate = document.createElement('p');
-                            notificationDate.textContent = `Дата: ${notification.date.toLocaleString()}`;
-                            notificationItem.appendChild(notificationDate);
-
-                            notificationsDiv.appendChild(notificationItem);
-                        });
-                    }
-
-                    appContent.appendChild(notificationsDiv);
-                }
-
-                // Убираем загрузчик и показываем приложение
-                setTimeout(() => {
-                    loader.classList.add('hidden');
-                    loader.style.display = 'none';
-                    app.classList.remove('hidden');
-                    updateTheme();
-                    toggleHighlight();
-                    navigateTo('nav-home'); // Переходим на главную страницу
-                }, 500); // Имитируем загрузку данных
-
-                // Обработка событий активации и деактивации WebApp
-                tg.onEvent('activeChanged', function() {
-                    console.log('WebApp active state changed:', tg.isActive);
-                });
-
-                tg.onEvent('fullscreenChanged', function() {
-                    console.log('Fullscreen mode changed:', tg.isFullscreen);
-                });
-
-                // Обработка безопасных зон
-                function updateSafeArea() {
-                    const safeArea = tg.safeAreaInset;
-                    appContent.style.paddingTop = (safeArea.top + 20) + 'px';
-                    appContent.style.paddingBottom = (safeArea.bottom + 20) + 'px';
-                }
-
-                tg.onEvent('safeAreaChanged', updateSafeArea);
-                tg.onEvent('viewportChanged', updateSafeArea);
-
-                updateSafeArea();
-
-            } catch (error) {
-                console.error('Произошла ошибка:', error);
-            }
+        };
+        console.warn('Telegram WebApp не найден. Используется заглушка для тестирования.');
+    }
+
+    // Оборачивание кода в try...catch для отлова ошибок
+    try {
+        // Устанавливаем полноэкранный режим
+        tg.expand();
+        tg.requestFullscreen();
+
+        //Получаем элементы DOM
+        const loader = document.getElementById('loader');
+        const app = document.getElementById('app');
+        const appContent = document.getElementById('app-content');
+        const gradientElem = document.getElementById('gradient');
+
+        // Навигационные кнопки
+        const navButtons = document.querySelectorAll('.nav-button');
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                navigateTo(button.id);
+            });
         });
-    </script>
+
+        // Данные пользователя
+        const initData = tg.initDataUnsafe.user;
+        let userFirstName = 'Имя';
+        let userLastName = '';
+        let username = '';
+        let userPhoto = '';
+        if (initData) {
+            userFirstName = initData.first_name || '';
+            userLastName = initData.last_name || '';
+            username = initData.username ? '@' + initData.username : '';
+            userPhoto = initData.photo_url || '';
+        }
+
+        // Настройки пользователя
+        let isHighlightEnabled = localStorage.getItem('isHighlightEnabled') === 'false' ? false : true;
+
+        // Данные о тарифе пользователя
+        let userBalance = 0; // Получить из бота через API
+        let userStatus = 'Неактивен';
+        let userTariff = '—';
+
+        // История загрузок пользователя
+        let downloadHistory = []; // Получить из бота через API
+
+        // Массив уведомлений
+        let notifications = [];
+
+        // Функция обновления информации о тарифе
+        function updateTariffInfo() {
+            if (userBalance > 0) {
+                userStatus = 'Активен';
+            } else {
+                userStatus = 'Неактивен';
+                userTariff = '—';
+            }
+        }
+
+        // Функция для обновления истории загрузок
+        function updateDownloadHistory() {
+            // Здесь вы можете сделать запрос к боту или серверу для получения истории
+            // Для примера используем статический массив
+            downloadHistory = [
+                {title: 'Видео 1', date: '2023-10-01'},
+                {title: 'Видео 2', date: '2023-10-02'},
+                {title: 'Видео 3', date: '2023-10-03'},
+            ];
+        }
+
+        // Функция обновления счетчика уведомлений
+        function updateNotificationsCounter() {
+            // Получаем количество непрочитанных уведомлений
+            const unreadCount = notifications.filter(n => !n.read).length;
+
+            // Получаем кнопку "Настройки" из навигации
+            const settingsButton = document.getElementById('nav-settings');
+
+            // Проверяем, есть ли уже элемент счетчика
+            let counterElem = settingsButton.querySelector('.notification-counter');
+
+            if (unreadCount > 0) {
+                if (!counterElem) {
+                    // Создаем новый элемент счетчика
+                    counterElem = document.createElement('span');
+                    counterElem.className = 'notification-counter';
+                    settingsButton.appendChild(counterElem);
+                }
+                counterElem.textContent = unreadCount;
+            } else {
+                // Если счетчик существует, удаляем его
+                if (counterElem) {
+                    counterElem.remove();
+                }
+            }
+        }
+
+        // Функция перехода на страницу
+        function navigateTo(pageId) {
+            appContent.innerHTML = ''; // Очищаем контент
+
+            // Добавляем кнопку "Назад" для страниц кроме главной и уведомлений
+            if (pageId !== 'nav-home' && pageId !== 'nav-notifications') {
+                const backButton = document.createElement('button');
+                backButton.className = 'back-button';
+                backButton.innerHTML = '←';
+                backButton.addEventListener('click', () => {
+                    document.getElementById('nav-home').click();
+                });
+                appContent.appendChild(backButton);
+            }
+
+            switch(pageId) {
+                case 'nav-home':
+                    renderHomePage();
+                    break;
+                case 'nav-tariffs':
+                    renderTariffsPage();
+                    break;
+                case 'nav-history':
+                    renderHistoryPage();
+                    break;
+                case 'nav-profile':
+                    renderProfilePage();
+                    break;
+                case 'nav-settings':
+                    renderSettingsPage();
+                    break;
+                case 'nav-notifications':
+                    renderNotificationsPage();
+                    break;
+                default:
+                    renderHomePage();
+            }
+        }
+
+        // Функция рендеринга главной страницы
+        function renderHomePage() {
+            updateTariffInfo();
+
+            // Остаток по тарифу
+            const balanceSection = document.createElement('div');
+            balanceSection.className = 'balance-section';
+
+            // Плашка при отсутствии тарифа
+            if (userBalance === 0) {
+                const noTariffBanner = document.createElement('div');
+                noTariffBanner.id = 'no-tariff-banner';
+                noTariffBanner.innerHTML = 'У вас не оформлен тариф. Перейдите в раздел <strong>"Тарифы"</strong>.';
+                noTariffBanner.addEventListener('click', () => {
+                    document.getElementById('nav-tariffs').click();
+                });
+                balanceSection.appendChild(noTariffBanner);
+            }
+
+            // Информация о балансе
+            const balanceInfo = document.createElement('div');
+            balanceInfo.id = 'balance-info';
+
+            const balanceElem = document.createElement('h1');
+            balanceElem.id = 'balance';
+            balanceElem.textContent = `${userBalance} видео`;
+            balanceInfo.appendChild(balanceElem);
+
+            const statusElem = document.createElement('p');
+            statusElem.id = 'status';
+            statusElem.textContent = userStatus;
+            if (userStatus === 'Активен') {
+                statusElem.classList.add('active');
+            }
+            balanceInfo.appendChild(statusElem);
+
+            const tariffNameElem = document.createElement('p');
+            tariffNameElem.id = 'tariff-name';
+            tariffNameElem.textContent = `Тариф: ${userTariff}`;
+            balanceInfo.appendChild(tariffNameElem);
+
+            balanceSection.appendChild(balanceInfo);
+
+            appContent.appendChild(balanceSection);
+        }
+
+        // Функция рендеринга страницы "Тарифы"
+        function renderTariffsPage() {
+            const tariffsDiv = document.createElement('div');
+            tariffsDiv.style.padding = '20px';
+            tariffsDiv.style.paddingTop = '60px';
+
+            const title = document.createElement('h2');
+            title.textContent = 'Тарифы';
+            title.style.marginBottom = '20px';
+            tariffsDiv.appendChild(title);
+
+            // Массив тарифов
+            const tariffs = [
+                {
+                    name: 'Пробный',
+                    description: 'Для скачивания доступно 100 видео',
+                    price: '399₽',
+                    image: '', // Добавьте ссылки на изображения тарифов
+                    action: 'Оформить',
+                    quantity: 100
+                },
+                {
+                    name: 'Новичок',
+                    description: 'Для скачивания доступно 500 видео',
+                    price: '1799₽',
+                    image: '',
+                    action: 'Оформить',
+                    quantity: 500
+                },
+                {
+                    name: 'Любитель',
+                    description: 'Для скачивания доступно 1000 видео',
+                    price: '2999₽',
+                    image: '',
+                    action: 'Оформить',
+                    quantity: 1000
+                },
+                {
+                    name: 'Профи',
+                    description: 'Для скачивания доступно 2000 видео',
+                    price: '5499₽',
+                    image: '',
+                    action: 'Оформить',
+                    quantity: 2000
+                },
+                {
+                    name: 'Бизнес',
+                    description: 'Для скачивания доступно 3000 видео',
+                    price: '9999₽',
+                    image: '',
+                    action: 'Оформить',
+                    quantity: 3000
+                },
+                {
+                    name: 'Бизнес VIP',
+                    description: 'Для скачивания доступно более 3000 видео',
+                    price: 'По договоренности',
+                    image: '',
+                    action: 'Связаться',
+                    quantity: 5000 // Предположим
+                }
+            ];
+
+            tariffs.forEach(tariff => {
+                const card = document.createElement('div');
+                card.className = 'tariff-card';
+
+                const image = document.createElement('div');
+                image.className = 'tariff-image';
+                // Если есть картинка, установить как фон
+                if (tariff.image) {
+                    const img = document.createElement('img');
+                    img.src = tariff.image;
+                    image.appendChild(img);
+                }
+                card.appendChild(image);
+
+                const info = document.createElement('div');
+                info.className = 'tariff-info';
+
+                const name = document.createElement('h3');
+                name.textContent = tariff.name;
+                info.appendChild(name);
+
+                const description = document.createElement('p');
+                description.textContent = tariff.description;
+                info.appendChild(description);
+
+                const price = document.createElement('div');
+                price.className = 'tariff-price';
+                price.textContent = tariff.price;
+                info.appendChild(price);
+
+                card.appendChild(info);
+
+                const actionDiv = document.createElement('div');
+                actionDiv.className = 'tariff-action';
+
+                const button = document.createElement('button');
+                button.className = 'tariff-button';
+                button.textContent = tariff.action;
+                button.addEventListener('click', () => {
+                    if (tariff.action === 'Связаться') {
+                        // Открыть чат с менеджером
+                        tg.sendData(JSON.stringify({action: 'contact_manager'}));
+                    } else {
+                        // Активировать тариф
+                        startPayment(tariff);
+                    }
+                });
+                actionDiv.appendChild(button);
+
+                card.appendChild(actionDiv);
+
+                tariffsDiv.appendChild(card);
+            });
+
+            appContent.appendChild(tariffsDiv);
+        }
+
+        // Функция для имитации активации тарифа
+        function startPayment(tariff) {
+            // Обновляем баланс пользователя
+            userBalance += tariff.quantity;
+
+            // Обновляем имя тарифа
+            userTariff = tariff.name;
+
+            // Обновляем статус пользователя
+            userStatus = 'Активен';
+
+            // Обновляем информацию о тарифе
+            updateTariffInfo();
+
+            // Создаем уведомление
+            let notification = {
+                id: Date.now(),
+                title: `Вы оформили тариф ${tariff.name}`,
+                message: `Доступно для скачивания ${tariff.quantity} видео`,
+                read: false,
+                timestamp: Date.now()
+            };
+
+            // Добавляем уведомление в массив
+            notifications.push(notification);
+
+            // Обновляем счетчик уведомлений
+            updateNotificationsCounter();
+
+            // Показываем уведомление
+            showNotificationBanner(notification);
+
+            // Переходим на главную страницу
+            navigateTo('nav-home');
+        }
+
+        // Функция рендеринга страницы "История"
+        function renderHistoryPage() {
+            updateDownloadHistory();
+
+            const historyDiv = document.createElement('div');
+            historyDiv.style.padding = '20px';
+            historyDiv.style.paddingTop = '60px';
+
+            const title = document.createElement('h2');
+            title.textContent = 'История загрузок';
+            title.style.marginBottom = '20px';
+            historyDiv.appendChild(title);
+
+            if (downloadHistory.length === 0) {
+                const emptyMessage = document.createElement('p');
+                emptyMessage.textContent = 'Вы еще не скачивали видео.';
+                historyDiv.appendChild(emptyMessage);
+            } else {
+                downloadHistory.forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+
+                    const itemTitle = document.createElement('h3');
+                    itemTitle.textContent = item.title;
+                    historyItem.appendChild(itemTitle);
+
+                    const itemDate = document.createElement('p');
+                    itemDate.textContent = `Дата: ${item.date}`;
+                    historyItem.appendChild(itemDate);
+
+                    historyDiv.appendChild(historyItem);
+                });
+            }
+
+            appContent.appendChild(historyDiv);
+        }
+
+        // Функция рендеринга страницы "Профиль"
+        function renderProfilePage() {
+            const profileDiv = document.createElement('div');
+            profileDiv.style.padding = '20px';
+            profileDiv.style.paddingTop = '60px';
+
+            const profileSection = document.createElement('div');
+            profileSection.className = 'profile';
+
+            const avatarElem = document.createElement('div');
+            avatarElem.className = 'avatar';
+
+            if (userPhoto) {
+                const img = document.createElement('img');
+                img.src = userPhoto;
+                avatarElem.appendChild(img);
+            } else {
+                avatarElem.textContent = userFirstName.charAt(0).toUpperCase();
+            }
+
+            profileSection.appendChild(avatarElem);
+
+            const userInfoDiv = document.createElement('div');
+            userInfoDiv.className = 'user-info';
+
+            const nameElem = document.createElement('h2');
+            nameElem.textContent = `${userFirstName} ${userLastName}`.trim();
+            userInfoDiv.appendChild(nameElem);
+
+            const usernameElem = document.createElement('p');
+            usernameElem.textContent = username;
+            userInfoDiv.appendChild(usernameElem);
+
+            profileSection.appendChild(userInfoDiv);
+
+            profileDiv.appendChild(profileSection);
+
+            appContent.appendChild(profileDiv);
+        }
+
+        // Функция рендеринга страницы "Настройки"
+        function renderSettingsPage() {
+            const settingsDiv = document.createElement('div');
+            settingsDiv.className = 'settings';
+
+            // Уведомления
+            const notificationsSetting = document.createElement('div');
+            notificationsSetting.className = 'settings-item';
+            notificationsSetting.style.cursor = 'pointer';
+
+            const notificationsLabel = document.createElement('span');
+            notificationsLabel.textContent = 'Уведомления';
+
+            // Проверяем количество непрочитанных уведомлений
+            const unreadCount = notifications.filter(n => !n.read).length;
+
+            if (unreadCount > 0) {
+                const notificationsCounterElem = document.createElement('span');
+                notificationsCounterElem.className = 'notification-counter';
+                notificationsCounterElem.textContent = unreadCount;
+                notificationsSetting.appendChild(notificationsCounterElem);
+            }
+
+            notificationsSetting.appendChild(notificationsLabel);
+
+            // Обработчик клика для открытия страницы уведомлений
+            notificationsSetting.addEventListener('click', () => {
+                navigateTo('nav-notifications'); // Используем navigateTo для консистентности
+            });
+
+            settingsDiv.appendChild(notificationsSetting);
+
+            const highlightSetting = document.createElement('div');
+            highlightSetting.className = 'settings-item';
+
+            const settingLabel = document.createElement('span');
+            settingLabel.textContent = 'Подсветка';
+
+            const switchLabel = document.createElement('label');
+            switchLabel.className = 'switch';
+
+            const switchInput = document.createElement('input');
+            switchInput.type = 'checkbox';
+            switchInput.checked = isHighlightEnabled;
+            switchInput.addEventListener('change', () => {
+                isHighlightEnabled = switchInput.checked;
+                localStorage.setItem('isHighlightEnabled', isHighlightEnabled);
+                toggleHighlight();
+            });
+
+            const switchSlider = document.createElement('span');
+            switchSlider.className = 'slider';
+
+            switchLabel.appendChild(switchInput);
+            switchLabel.appendChild(switchSlider);
+
+            highlightSetting.appendChild(settingLabel);
+            highlightSetting.appendChild(switchLabel);
+
+            settingsDiv.appendChild(highlightSetting);
+
+            // Добавляем плашку "Поддержка"
+            const supportSetting = document.createElement('div');
+            supportSetting.className = 'settings-item';
+            supportSetting.style.cursor = 'pointer';
+
+            const supportLabel = document.createElement('span');
+            supportLabel.textContent = 'Поддержка';
+
+            supportSetting.appendChild(supportLabel);
+
+            // Добавляем обработчик события для открытия чата с менеджером
+            supportSetting.addEventListener('click', () => {
+                tg.sendData(JSON.stringify({action: 'contact_manager'}));
+            });
+
+            settingsDiv.appendChild(supportSetting);
+
+            appContent.appendChild(settingsDiv);
+        }
+
+        // Функция рендеринга страницы "Уведомления"
+        function renderNotificationsPage() {
+            appContent.innerHTML = ''; // Очищаем контент
+
+            // Добавляем кнопку "Назад"
+            const backButton = document.createElement('button');
+            backButton.className = 'back-button';
+            backButton.innerHTML = '←';
+            backButton.addEventListener('click', () => {
+                navigateTo('nav-settings'); // Возвращаемся в настройки
+            });
+            appContent.appendChild(backButton);
+
+            // Заголовок
+            const title = document.createElement('h2');
+            title.textContent = 'Уведомления';
+            title.style.margin = '20px';
+            appContent.appendChild(title);
+
+            // Кнопка "Прочитать все"
+            const markAllReadButton = document.createElement('button');
+            markAllReadButton.textContent = 'Прочитать все';
+            markAllReadButton.addEventListener('click', () => {
+                notifications.forEach(n => n.read = true);
+                updateNotificationsCounter();
+                renderNotificationsPage(); // Обновляем страницу
+            });
+            markAllReadButton.style.margin = '20px'; // Добавляем отступ
+            appContent.appendChild(markAllReadButton);
+
+            // Список уведомлений
+            const notificationsList = document.createElement('div');
+            notificationsList.className = 'notifications-list';
+
+            notifications.forEach(notification => {
+                const notificationItem = document.createElement('div');
+                notificationItem.className = 'notification-item';
+
+                const notificationTitle = document.createElement('h3');
+                notificationTitle.textContent = notification.title;
+                notificationItem.appendChild(notificationTitle);
+
+                const notificationMessage = document.createElement('p');
+                notificationMessage.textContent = notification.message;
+                notificationItem.appendChild(notificationMessage);
+
+                if (!notification.read) {
+                    const unreadIndicator = document.createElement('span');
+                    unreadIndicator.className = 'unread-indicator';
+                    unreadIndicator.textContent = 'Непрочитано';
+                    notificationItem.appendChild(unreadIndicator);
+                }
+
+                notificationItem.addEventListener('click', () => {
+                    notification.read = true;
+                    updateNotificationsCounter();
+                    renderNotificationsPage();
+                });
+
+                notificationsList.appendChild(notificationItem);
+            });
+
+            appContent.appendChild(notificationsList);
+        }
+
+        // Функция переключения подсветки
+        function toggleHighlight() {
+            if (isHighlightEnabled) {
+                gradientElem.style.display = 'block';
+            } else {
+                gradientElem.style.display = 'none';
+            }
+        }
+
+        // Функция отображения уведомления
+        function showNotificationBanner(notification) {
+            const banner = document.createElement('div');
+            banner.className = 'notification-banner';
+
+            const bannerTitle = document.createElement('p');
+            bannerTitle.textContent = notification.title;
+            banner.appendChild(bannerTitle);
+
+            const bannerMessage = document.createElement('p');
+            bannerMessage.textContent = notification.message;
+            banner.appendChild(bannerMessage);
+
+            const acceptButton = document.createElement('span');
+            acceptButton.className = 'notification-accept-button';
+            acceptButton.textContent = 'Принято';
+            acceptButton.addEventListener('click', () => {
+                notification.read = true;
+                updateNotificationsCounter();
+                banner.remove();
+            });
+            banner.appendChild(acceptButton);
+
+            // Добавляем баннер в приложение
+            document.body.appendChild(banner);
+
+            // Анимация появления баннера
+            setTimeout(() => {
+                banner.classList.add('show');
+            }, 10);
+
+            // Убираем баннер через 2 секунды, если не нажато "Принято"
+            setTimeout(() => {
+                if (!notification.read) {
+                    banner.classList.remove('show');
+                    setTimeout(() => {
+                        banner.remove();
+                    }, 300);
+                }
+            }, 2000);
+        }
+
+        // Убираем загрузчик и показываем приложение
+        setTimeout(() => {
+            if (loader) loader.classList.add('hidden');
+            if (app) app.classList.remove('hidden');
+            navigateTo('nav-home'); // Переходим на главную страницу
+        }, 500); // Имитируем загрузку данных
+
+        // Обработка событий активации и деактивации WebApp
+        tg.onEvent('activeChanged', function() {
+            console.log('WebApp active state changed:', tg.isActive);
+        });
+
+        tg.onEvent('fullscreenChanged', function() {
+            console.log('Fullscreen mode changed:', tg.isFullscreen);
+        });
+
+        // Обработка безопасных зон
+        function updateSafeArea() {
+            const safeArea = tg.safeAreaInset;
+            appContent.style.paddingTop = (safeArea.top + 20) + 'px';
+            appContent.style.paddingBottom = (safeArea.bottom + 20) + 'px';
+        }
+
+        tg.onEvent('safeAreaChanged', updateSafeArea);
+        tg.onEvent('viewportChanged', updateSafeArea);
+
+        updateSafeArea();
+
+        // Изначально устанавливаем состояние подсветки
+        toggleHighlight();
+
+    } catch (error) {
+        console.error('Произошла ошибка:', error);
+    }
+});
+</script>
 </body>
 </html>
