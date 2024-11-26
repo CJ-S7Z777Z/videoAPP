@@ -11,18 +11,40 @@
             margin: 0;
             padding: 0;
             font-family: 'Arial', sans-serif;
-            background-color: #121212;
-            color: #FFFFFF;
+            background-color: #0B0C10;
+            color: #C5C6C7;
             overflow: hidden;
             height: 100vh;
         }
 
         /* Скрытый контент до загрузки */
         .hidden {
-            display: flex;
+            display: none;
         }
 
         /* Анимация загрузки */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0B0C10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            border: 8px solid #C5C6C7;
+            border-top: 8px solid #1F2833;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -34,18 +56,17 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 20px;
-            box-shadow: 0px 0px 30px 10px transparent;
-            animation: gradientGlow 15s ease-in-out infinite;
+            height: 5px;
+            background: linear-gradient(90deg, #66FCF1, #45A29E, #1F2833, #66FCF1);
+            background-size: 600% 100%;
+            animation: gradientAnimation 10s ease infinite;
             z-index: 1;
         }
 
-        @keyframes gradientGlow {
-            0% { box-shadow: 0px 0px 30px 10px #FF3B30; }
-            25% { box-shadow: 0px 0px 30px 10px #1DB954; }
-            50% { box-shadow: 0px 0px 30px 10px #1E90FF; }
-            75% { box-shadow: 0px 0px 30px 10px #FFA500; }
-            100% { box-shadow: 0px 0px 30px 10px #FF69B4; }
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         /* Главный контент */
@@ -67,12 +88,12 @@
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background-color: #1DB954;
+            background-color: #45A29E;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 36px;
-            color: #FFFFFF;
+            color: #FFF;
             margin-right: 15px;
             overflow: hidden;
         }
@@ -84,39 +105,50 @@
 
         .user-info h2, .user-info p {
             margin: 0;
+            color: #FFF;
         }
 
         /* Остаток по тарифу */
         .balance-section {
             text-align: center;
             margin-top: 30px;
+            color: #FFF;
         }
 
         #no-tariff-banner {
-            background-color: #FF3B30;
-            padding: 10px;
+            background-color: #45A29E;
+            padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
             cursor: pointer;
+            color: #0B0C10;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        #no-tariff-banner:hover {
+            background-color: #66FCF1;
         }
 
         #balance-info h1 {
             font-size: 48px;
             margin: 0;
+            color: #66FCF1;
         }
 
         #balance-info p {
             margin: 5px 0;
+            font-size: 18px;
         }
 
         /* Статус */
         #status {
-            color: #FF3B30; /* Красный по умолчанию (Неактивен) */
+            color: #C5C6C7;
             font-weight: bold;
         }
 
         #status.active {
-            color: #4CD964; /* Зеленый (Активен) */
+            color: #66FCF1;
         }
 
         /* Навигационная панель */
@@ -125,25 +157,31 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: #1E1E1E;
+            background-color: #1F2833;
             display: flex;
             justify-content: space-around;
             padding: 10px 0;
+            border-top: 1px solid #45A29E;
         }
 
         .nav-button {
             background: none;
             border: none;
-            color: #FFFFFF;
+            color: #C5C6C7;
             font-size: 16px;
             flex-grow: 1;
             padding: 10px 0;
             cursor: pointer;
+            transition: color 0.3s;
         }
 
         .nav-button.active {
-            border-top: 2px solid #1DB954;
-            color: #1DB954;
+            border-top: 2px solid #66FCF1;
+            color: #66FCF1;
+        }
+
+        .nav-button:hover {
+            color: #66FCF1;
         }
 
         /* Переключатель */
@@ -163,7 +201,7 @@
         .slider {
             position: absolute;
             cursor: pointer;
-            background-color: #ccc;
+            background-color: #C5C6C7;
             border-radius: 34px;
             top: 0;
             left: 0;
@@ -179,13 +217,13 @@
             width: 20px;
             left: 4px;
             bottom: 4px;
-            background-color: white;
+            background-color: #0B0C10;
             transition: .4s;
             border-radius: 50%;
         }
 
         input:checked + .slider {
-            background-color: #4CD964;
+            background-color: #66FCF1;
         }
 
         input:checked + .slider:before {
@@ -203,6 +241,13 @@
             justify-content: space-between;
             align-items: center;
             margin: 15px 0;
+            border-bottom: 1px solid #45A29E;
+            padding-bottom: 10px;
+            color: #FFF;
+        }
+
+        .settings-item:hover {
+            color: #66FCF1;
         }
 
         /* Кнопка "Назад" */
@@ -212,35 +257,37 @@
             left: 20px;
             background: none;
             border: none;
-            color: #FFFFFF;
+            color: #66FCF1;
             font-size: 24px;
-            cursor: pointer;
+            cursor:pointer;
             z-index: 2;
         }
 
         /* Секция тарифов */
         .tariff-card {
-            background-color: #1E1E1E;
+            background-color: #1F2833;
             border-radius: 10px;
             padding: 15px;
             display: flex;
             align-items: center;
             margin-bottom: 15px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
 
         .tariff-card:hover {
-            background-color: #2A2A2A;
+            background-color: #45A29E;
         }
 
         .tariff-image {
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background-color: #333333;
+            background-color: #0B0C10;
             margin-right: 15px;
             flex-shrink: 0;
             overflow: hidden;
+            border: 2px solid #66FCF1;
         }
 
         .tariff-image img {
@@ -251,6 +298,7 @@
 
         .tariff-info {
             flex-grow: 1;
+            color: #FFF;
         }
 
         .tariff-info h3 {
@@ -260,13 +308,15 @@
 
         .tariff-info p {
             margin: 5px 0;
-            color: #AAAAAA;
+            color: #C5C6C7;
+            font-size: 14px;
         }
 
         .tariff-price {
             font-size: 16px;
             font-weight: bold;
             margin-top: 10px;
+            color: #66FCF1;
         }
 
         .tariff-action {
@@ -275,25 +325,27 @@
 
         .tariff-button {
             padding: 10px 15px;
-            background-color: #1DB954;
+            background-color: #66FCF1;
             border: none;
             border-radius: 5px;
-            color: #FFFFFF;
+            color: #0B0C10;
             cursor: pointer;
             transition: background-color 0.3s;
+            font-weight: bold;
         }
 
         .tariff-button:hover {
-            background-color: #17A44A;
+            background-color: #45A29E;
         }
 
         .tariff-button:active {
-            background-color: #14803D;
+            background-color: #1F2833;
         }
 
         /* Дополнительные стили */
         h2, h1 {
             margin: 0;
+            color: #FFF;
         }
 
         /* Обеспечение безопасной зоны */
@@ -307,10 +359,16 @@
 
         /* История загрузок */
         .history-item {
-            background-color: #1E1E1E;
+            background-color: #1F2833;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 15px;
+            color: #FFF;
+            transition: background-color 0.3s;
+        }
+
+        .history-item:hover {
+            background-color: #45A29E;
         }
 
         .history-item h3 {
@@ -320,8 +378,24 @@
 
         .history-item p {
             margin: 5px 0;
-            color: #AAAAAA;
+            color: #C5C6C7;
             font-size: 14px;
+        }
+
+        /* Стили для кнопок связаться */
+        .contact-button {
+            padding: 10px 15px;
+            background-color: #66FCF1;
+            border: none;
+            border-radius: 5px;
+            color: #0B0C10;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+
+        .contact-button:hover {
+            background-color: #45A29E;
         }
     </style>
 
@@ -366,6 +440,7 @@
                 tg = {
                     initDataUnsafe: {
                         user: {
+                            id: 123456,
                             first_name: 'Тест',
                             last_name: 'Пользователь',
                             username: 'testuser',
@@ -385,13 +460,16 @@
                 console.warn('Telegram WebApp не найден. Используется заглушка для тестирования.');
             }
 
+            // Константа с юзернеймом менеджера
+            const managerUsername = '@mwii_boss'; // Замените на юзернейм вашего менеджера без @
+
             // Оборачивание кода в try...catch для отлова ошибок
             try {
                 // Устанавливаем полноэкранный режим
                 tg.expand();
                 tg.requestFullscreen();
 
-                //Получаем элементы DOM
+                // Получаем элементы DOM
                 const loader = document.getElementById('loader');
                 const app = document.getElementById('app');
                 const appContent = document.getElementById('app-content');
@@ -413,6 +491,8 @@
                 let userLastName = '';
                 let username = '';
                 let userPhoto = '';
+                let userId = initData.id || 0;
+
                 if (initData) {
                     userFirstName = initData.first_name || '';
                     userLastName = initData.last_name || '';
@@ -431,7 +511,7 @@
                 // История загрузок пользователя
                 let downloadHistory = []; // Получить из бота через API
 
-                // Функция обновления информации о тарифе
+                //Функция обновления информации о тарифе
                 function updateTariffInfo() {
                     if (userBalance > 0) {
                         userStatus = 'Активен';
@@ -478,7 +558,7 @@
                         case 'nav-history':
                             renderHistoryPage();
                             break;
-                            case 'nav-profile':
+                        case 'nav-profile':
                             renderProfilePage();
                             break;
                         case 'nav-settings':
@@ -579,7 +659,7 @@
                         {
                             name: 'Бизнес',
                             description: 'Для скачивания доступно 3000 видео',
-                            price: '9999₽',
+                            price: '6999₽',
                             image: '',
                             action: 'Оформить'
                         },
@@ -608,7 +688,6 @@
 
                         const info = document.createElement('div');
                         info.className = 'tariff-info';
-
                         const name = document.createElement('h3');
                         name.textContent = tariff.name;
                         info.appendChild(name);
@@ -628,12 +707,12 @@
                         actionDiv.className = 'tariff-action';
 
                         const button = document.createElement('button');
-                        button.className = 'tariff-button';
+                        button.className = tariff.action === 'Связаться' ? 'contact-button' : 'tariff-button';
                         button.textContent = tariff.action;
                         button.addEventListener('click', () => {
                             if (tariff.action === 'Связаться') {
                                 // Открыть чат с менеджером
-                                tg.sendData(JSON.stringify({action: 'contact_manager'}));
+                                openTelegramChat(managerUsername);
                             } else {
                                 // Перейти к оплате через Юкассу
                                 startPayment(tariff);
@@ -649,17 +728,26 @@
                     appContent.appendChild(tariffsDiv);
                 }
 
+                // Функция открытия чата с менеджером
+                function openTelegramChat(username) {
+                    if (tg.initDataUnsafe.user) {
+                        window.location.href = `https://t.me/${username}`;
+                    } else {
+                        alert('Не удалось открыть чат с менеджером.');
+                    }
+                }
+
                 // Функция для инициации платежа через Юкасса
                 function startPayment(tariff) {
                     // Здесь вы можете интегрировать платеж через Юкасса, используя Shop ID
                     // Например, открываем форму оплаты в новом окне или фрейме
 
-                    // Создаем объект данных для передачи в бота
+                    // Создаем объект данных для передачи в боту
                     const paymentData = {
                         action: 'pay',
                         tariff: tariff.name,
                         amount: tariff.price.replace('₽', ''),
-                        userId: tg.initDataUnsafe.user.id
+                        userId: userId
                     };
 
                     // Отправляем данные боту
@@ -691,6 +779,7 @@
                     if (downloadHistory.length === 0) {
                         const emptyMessage = document.createElement('p');
                         emptyMessage.textContent = 'Вы еще не скачивали видео.';
+                        emptyMessage.style.color = '#C5C6C7';
                         historyDiv.appendChild(emptyMessage);
                     } else {
                         downloadHistory.forEach(item => {
@@ -798,7 +887,7 @@
 
                     // Добавляем обработчик события для открытия чата с менеджером
                     supportSetting.addEventListener('click', () => {
-                        tg.sendData(JSON.stringify({action: 'contact_manager'}));
+                        openTelegramChat(managerUsername);
                     });
 
                     settingsDiv.appendChild(supportSetting);
@@ -818,6 +907,7 @@
                 // Убираем загрузчик и показываем приложение
                 setTimeout(() => {
                     loader.classList.add('hidden');
+                    loader.style.display = 'none';
                     app.classList.remove('hidden');
                     navigateTo('nav-home'); // Переходим на главную страницу
                 }, 500); // Имитируем загрузку данных
