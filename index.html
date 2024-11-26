@@ -489,31 +489,7 @@
         .mark-all-read-button:active {
             background-color: #14803D;
         }
-        
-        /* Плашка успешного оформления */
-        .success-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.7); /* Полупрозрачный черный фон */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    .success-overlay.show {
-    opacity: 1;
-    }
-    
-    .success-overlay .success-message {
-    color: #FFFFFF;
-    font-size: 24px;
-    }
+
     </style>
 
     <!-- Инициализация Telegram Web App -->
@@ -533,11 +509,6 @@
         <!-- Контент приложения -->
         <div id="app-content">
             <!-- Здесь будет динамически меняться содержимое -->
-        </div>
-
-        <!-- Плашка успешного оформления -->
-        <div id="successOverlay" class="success-overlay">
-            <div class="success-message">✅ Успешно!</div>
         </div>
 
         <!-- Навигационная панель -->
@@ -592,7 +563,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const loader = document.getElementById('loader');
         const app = document.getElementById('app');
         const appContent = document.getElementById('app-content');
-        const successOverlay = document.getElementById('successOverlay');
         const gradientElem = document.getElementById('gradient');
 
         // Настройки пользователя
@@ -1031,16 +1001,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             appContent.appendChild(tariffsDiv);
         }
-
-        // Функция показа плашки успеха
-        function showSuccessOverlay() {
-            const successOverlay = document.getElementById('successOverlay');
-            successOverlay.classList.add('show');
-            setTimeout(() => {
-                successOverlay.classList.remove('show');
-            }, 1000); // Через 1 секунду плашка исчезнет
-            }
-
 
         // Функция для имитации активации тарифа
         function startPayment(tariff) {
