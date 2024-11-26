@@ -19,36 +19,41 @@
 
         /* Скрытый контент до загрузки */
         .hidden {
-            display: none;
+            display: flex;
         }
+
+        /* Анимация загрузки */
+
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        /* Плавная подсветка */
+        /* Плавная подсветка (градиент) */
         #gradient {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 200px;
-            background: linear-gradient(-45deg, #1DB954, #1E90FF, #FF69B4, #FFA500);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
-            z-index: -1;
+            height: 20px;
+            box-shadow: 0px 0px 30px 10px transparent;
+            animation: gradientGlow 15s ease-in-out infinite;
+            z-index: 1;
         }
 
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% {background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        @keyframes gradientGlow {
+            0% { box-shadow: 0px 0px 30px 10px #FF3B30; }
+            25% { box-shadow: 0px 0px 30px 10px #1DB954; }
+            50% { box-shadow: 0px 0px 30px 10px #1E90FF; }
+            75% { box-shadow: 0px 0px 30px 10px #FFA500; }
+            100% { box-shadow: 0px 0px 30px 10px #FF69B4; }
         }
 
         /* Главный контент */
         #app-content {
             padding: 20px;
+            padding-top: 60px; /* Отступ сверху для безопасной зоны */
         }
 
         /* Профиль пользователя */
@@ -71,6 +76,7 @@
             margin-right: 15px;
             overflow: hidden;
         }
+
         .avatar img {
             width: 100%;
             height: 100%;
@@ -177,6 +183,7 @@
             transition: .4s;
             border-radius: 50%;
         }
+
         input:checked + .slider {
             background-color: #4CD964;
         }
@@ -188,6 +195,7 @@
         /* Страница настроек */
         .settings {
             padding: 20px;
+            padding-top: 60px;
         }
 
         .settings-item {
@@ -207,11 +215,94 @@
             color: #FFFFFF;
             font-size: 24px;
             cursor: pointer;
+            z-index: 2;
+        }
+
+        /* Секция тарифов */
+        .tariff-card {
+            background-color: #1E1E1E;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .tariff-card:hover {
+            background-color: #2A2A2A;
+        }
+
+        .tariff-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #333333;
+            margin-right: 15px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .tariff-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .tariff-info {
+            flex-grow: 1;
+        }
+
+        .tariff-info h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .tariff-info p {
+            margin: 5px 0;
+            color: #AAAAAA;
+        }
+
+        .tariff-price {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .tariff-action {
+            margin-left: 10px;
+        }
+
+        .tariff-button {
+            padding: 10px 15px;
+            background-color: #1DB954;
+            border: none;
+            border-radius: 5px;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .tariff-button:hover {
+            background-color: #17A44A;
+        }
+
+        .tariff-button:active {
+            background-color: #14803D;
         }
 
         /* Дополнительные стили */
         h2, h1 {
             margin: 0;
+        }
+
+        /* Обеспечение безопасной зоны */
+        #app-content {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .navbar {
+            padding-bottom: env(safe-area-inset-bottom);
         }
     </style>
 
@@ -226,7 +317,7 @@
 
     <!-- Основной контент -->
     <div id="app" class="hidden">
-        <!-- Плавная подсветка -->
+        <!-- Плавная подсветка (градиент) -->
         <div id="gradient"></div>
 
         <!-- Контент приложения -->
@@ -262,13 +353,23 @@
                         }
                     },
                     expand: function() {},
+                    requestFullscreen: function() {},
+                    onEvent: function() {},
+                    safeAreaInset: {top: 0, bottom: 0},
+                    isActive: true,
+                    isFullscreen: true,
+                    sendData: function(data) {
+                        console.log('Отправка данных боту:', data);
+                    }
                 };
                 console.warn('Telegram WebApp не найден. Используется заглушка для тестирования.');
             }
 
+            // Оборачивание кода в try...catch для отлова ошибок
             try {
                 // Устанавливаем полноэкранный режим
                 tg.expand();
+                tg.requestFullscreen();
 
                 // Получаем элементы DOM
                 const loader = document.getElementById('loader');
@@ -327,7 +428,8 @@
                         const backButton = document.createElement('button');
                         backButton.className = 'back-button';
                         backButton.innerHTML = '←';
-                        backButton.addEventListener('click', () => {document.getElementById('nav-home').click();
+                        backButton.addEventListener('click', () => {
+                            document.getElementById('nav-home').click();
                         });
                         appContent.appendChild(backButton);
                     }
@@ -400,14 +502,111 @@
                 function renderTariffsPage() {
                     const tariffsDiv = document.createElement('div');
                     tariffsDiv.style.padding = '20px';
+                    tariffsDiv.style.paddingTop = '60px';
 
                     const title = document.createElement('h2');
                     title.textContent = 'Тарифы';
+                    title.style.marginBottom = '20px';
                     tariffsDiv.appendChild(title);
 
-                    const info = document.createElement('p');
-                    info.textContent = 'Здесь будут представлены доступные тарифы.';
-                    tariffsDiv.appendChild(info);
+                    // Массив тарифов
+                    const tariffs = [
+                        {
+                            name: 'Базовый',
+                            description: 'Идеально для начинающих',
+                            price: '499₽',
+                            image: '', // Добавьте ссылки на изображения тарифов
+                            action: 'Оформить'
+                        },
+                        {
+                            name: 'Продвинутый',
+                            description: 'Больше возможностей',
+                            price: '999₽',
+                            image: '',
+                            action: 'Оформить'
+                        },
+                        {
+                            name: 'Профессиональный',
+                            description: 'Для экспертов',
+                            price: '1999₽',
+                            image: '',
+                            action: 'Оформить'
+                        },
+                        {
+                            name: 'Бизнес',
+                            description: 'Для компаний',
+                            price: '4999₽',
+                            image: '',
+                            action: 'Оформить'
+                        },
+                        {
+                            name: 'Премиум',
+                            description: 'Максимальные возможности',
+                            price: '9999₽',
+                            image: '',
+                            action: 'Оформить'
+                        },
+                        {
+                            name: 'Индивидуальный',
+                            description: 'Под ваши потребности',
+                            price: 'По договоренности',
+                            image: '',action: 'Связаться'
+                        }
+                    ];
+
+                    tariffs.forEach(tariff => {
+                        const card = document.createElement('div');
+                        card.className = 'tariff-card';
+
+                        const image = document.createElement('div');
+                        image.className = 'tariff-image';
+                        // Если есть картинка, установить как фон
+                        if (tariff.image) {
+                            const img = document.createElement('img');
+                            img.src = tariff.image;
+                            image.appendChild(img);
+                        }
+                        card.appendChild(image);
+
+                        const info = document.createElement('div');
+                        info.className = 'tariff-info';
+
+                        const name = document.createElement('h3');
+                        name.textContent = tariff.name;
+                        info.appendChild(name);
+
+                        const description = document.createElement('p');
+                        description.textContent = tariff.description;
+                        info.appendChild(description);
+
+                        const price = document.createElement('div');
+                        price.className = 'tariff-price';
+                        price.textContent = tariff.price;
+                        info.appendChild(price);
+
+                        card.appendChild(info);
+
+                        const actionDiv = document.createElement('div');
+                        actionDiv.className = 'tariff-action';
+
+                        const button = document.createElement('button');
+                        button.className = 'tariff-button';
+                        button.textContent = tariff.action;
+                        button.addEventListener('click', () => {
+                            if (tariff.action === 'Связаться') {
+                                // Открыть чат с менеджером
+                                tg.sendData(JSON.stringify({action: 'contact_manager'}));
+                            } else {
+                                // Перейти к оплате через Юкассу
+                                tg.sendData(JSON.stringify({action: 'pay', tariff: tariff.name}));
+                            }
+                        });
+                        actionDiv.appendChild(button);
+
+                        card.appendChild(actionDiv);
+
+                        tariffsDiv.appendChild(card);
+                    });
 
                     appContent.appendChild(tariffsDiv);
                 }
@@ -416,6 +615,7 @@
                 function renderProfilePage() {
                     const profileDiv = document.createElement('div');
                     profileDiv.style.padding = '20px';
+                    profileDiv.style.paddingTop = '60px';
 
                     const profileSection = document.createElement('div');
                     profileSection.className = 'profile';
@@ -503,6 +703,30 @@
                     navigateTo('nav-home'); // Переходим на главную страницу
                 }, 500); // Имитируем загрузку данных
 
+                // Обработка событий активации и деактивации WebApp
+                tg.onEvent('activeChanged', function() {
+                    console.log('WebApp active state changed:', tg.isActive);
+                });
+
+                tg.onEvent('fullscreenChanged', function() {
+                    console.log('Fullscreen mode changed:', tg.isFullscreen);
+                });
+
+                // Обработка безопасных зон
+                function updateSafeArea() {
+                    const safeArea = tg.safeAreaInset;
+                    appContent.style.paddingTop = (safeArea.top + 20) + 'px';
+                    appContent.style.paddingBottom = (safeArea.bottom + 20) + 'px';
+                }
+
+                tg.onEvent('safeAreaChanged', updateSafeArea);
+                tg.onEvent('viewportChanged', updateSafeArea);
+
+                updateSafeArea();
+
+                // Изначально устанавливаем состояние подсветки
+                toggleHighlight();
+
             } catch (error) {
                 console.error('Произошла ошибка:', error);
             }
@@ -510,4 +734,3 @@
     </script>
 </body>
 </html>
-
