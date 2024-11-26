@@ -19,10 +19,26 @@
 
         /* Скрытый контент до загрузки */
         .hidden {
-            display: flex;
+            display: none;
         }
 
         /* Анимация загрузки */
+        #loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #1DB954;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -53,7 +69,7 @@
             padding: 20px;
             padding-top: 60px; /* Отступ сверху для безопасной зоны */
             overflow-y: auto; /* Добавлено для скроллинга */
-            height: calc(100vh - 60px - 60px); /* Высота контента с учетом navbar и отступа сверху */
+            height: calc(100vh - 60px); /* Высота контента с учетом navbar */
         }
 
         /* Профиль пользователя */
@@ -321,12 +337,21 @@
             padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* История загрузок */
+        /* История действий */
+        .history-section {
+            margin-top: 30px;
+        }
+
         .history-item {
             background-color: #1E1E1E;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        .history-item:hover {
+            background-color: #2A2A2A;
         }
 
         .history-item h3 {
@@ -342,7 +367,7 @@
 
         /* Уведомление */
         .notification-banner {
-            position: absolute;
+            position: fixed;
             top: 10%;
             left: 5%;
             right: 5%;
@@ -387,6 +412,10 @@
             cursor: pointer;
         }
 
+        .notification-item:hover {
+            background-color: #2A2A2A;
+        }
+
         .notification-item h3 {
             margin: 0;
             font-size: 16px;
@@ -408,6 +437,75 @@
             padding: 2px 6px;
             font-size: 12px;
         }
+
+        /* Попап для подробной информации */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        .popup-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1E1E1E;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+            overflow: hidden;
+        }
+
+        .popup-content h3 {
+            margin-top: 0;
+        }
+
+        .popup-close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #FFFFFF;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .popup-content a {
+            color: #1E90FF;
+            text-decoration: none;
+        }
+
+        .popup-content a:hover {
+            text-decoration: underline;
+        }
+
+        /* Кнопка "Прочитать все" */
+        .mark-all-read-button {
+            padding: 10px 15px;
+            background-color: #1DB954;
+            border: none;
+            border-radius: 5px;
+            color: #FFFFFF;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 20px;
+        }
+
+        .mark-all-read-button:hover {
+            background-color: #17A44A;
+        }
+
+        .mark-all-read-button:active {
+            background-color: #14803D;
+        }
+
     </style>
 
     <!-- Инициализация Telegram Web App -->
@@ -433,7 +531,7 @@
         <div class="navbar">
             <button class="nav-button active" id="nav-home">Главная</button>
             <button class="nav-button" id="nav-tariffs">Тарифы</button>
-            <button class="nav-button" id="nav-history">История</button>
+            <!-- Удалена кнопка "История" -->
             <button class="nav-button" id="nav-profile">Профиль</button>
             <button class="nav-button" id="nav-settings">Настройки</button>
         </div>
@@ -471,7 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Telegram WebApp не найден. Используется заглушка для тестирования.');
     }
 
-    // Оборачивание кода в try...catch для отлова ошибок
+    // Оборачиваем код в try...catch для отлова ошибок
     try {
         // Устанавливаем полноэкранный режим
         tg.expand();
@@ -483,42 +581,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const appContent = document.getElementById('app-content');
         const gradientElem = document.getElementById('gradient');
 
-        // Навигационные кнопки
-        const navButtons = document.querySelectorAll('.nav-button');
-        navButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                navButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                navigateTo(button.id);
-            });
-        });
-
-        // Данные пользователя
-        const initData = tg.initDataUnsafe.user;
-        let userFirstName = 'Имя';
-        let userLastName = '';
-        let username = '';
-        let userPhoto = '';
-        if (initData) {
-            userFirstName = initData.first_name || '';
-            userLastName = initData.last_name || '';
-            username = initData.username ? '@' + initData.username : '';
-            userPhoto = initData.photo_url || '';
-        }
-
         // Настройки пользователя
         let isHighlightEnabled = localStorage.getItem('isHighlightEnabled') === 'false' ? false : true;
+
+        // Данные пользователя
+        const initData = tg.initDataUnsafe.user || {};
+        const userFirstName = initData.first_name || 'Имя';
+        const userLastName = initData.last_name || '';
+        const username = initData.username ? '@' + initData.username : '';
+        const userPhoto = initData.photo_url || '';
 
         // Данные о тарифе пользователя
         let userBalance = 0; // Получить из бота через API
         let userStatus = 'Неактивен';
         let userTariff = '—';
 
-        // История загрузок пользователя
-        let downloadHistory = []; // Получить из бота через API
+        // История действий пользователя
+        let userHistory = []; // Получить из бота через API
 
         // Массив уведомлений
         let notifications = [];
+
+        // Переменная с юзернеймом менеджера поддержки
+        const managerUsername = '@mwii_boss'; // Замените на актуальный юзернейм
 
         // Функция обновления информации о тарифе
         function updateTariffInfo() {
@@ -530,14 +615,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Функция для обновления истории загрузок
-        function updateDownloadHistory() {
+        // Функция для обновления истории действий
+        function updateUserHistory() {
             // Здесь вы можете сделать запрос к боту или серверу для получения истории
             // Для примера используем статический массив
-            downloadHistory = [
-                {title: 'Видео 1', date: '2023-10-01'},
-                {title: 'Видео 2', date: '2023-10-02'},
-                {title: 'Видео 3', date: '2023-10-03'},
+            userHistory = [
+                {
+                    type: 'download',
+                    source: 'YouTube',
+                    title: 'Видео 1',
+                    link: 'https://youtu.be/video1',
+                    size: 50,
+                    date: '2023-10-01 12:00'
+                },
+                {
+                    type: 'subscription',
+                    tariffName: 'Пробный',
+                    quantity: 100,
+                    price: '399₽',
+                    date: '2023-10-02 14:30'
+                },
+                {
+                    type: 'publication',
+                    groupName: 'Группа ВК',
+                    date: '2023-10-03 16:45'
+                }
             ];
         }
 
@@ -568,7 +670,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Функция перехода на страницу
+        // Функция переключения подсветки
+        function toggleHighlight() {
+            if (isHighlightEnabled) {
+                gradientElem.style.display = 'block';
+            } else {
+                gradientElem.style.display = 'none';
+            }
+        }
+
+        // Функция обновления безопасных зон
+        function updateSafeArea() {
+            const safeArea = tg.safeAreaInset;
+            const topPadding = (safeArea.top || 0) + 20;
+            const bottomPadding = (safeArea.bottom || 0) + 20;
+            appContent.style.paddingTop = topPadding + 'px';
+            appContent.style.paddingBottom = bottomPadding + 'px';
+        }
+
+        // Функция рендеринга основного контента
         function navigateTo(pageId) {
             appContent.innerHTML = ''; // Очищаем контент
 
@@ -578,20 +698,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 backButton.className = 'back-button';
                 backButton.innerHTML = '←';
                 backButton.addEventListener('click', () => {
-                    document.getElementById('nav-home').click();
+                    navigateTo('nav-home');
+                    document.getElementById('nav-home').classList.add('active');
+                    const activeButtons = document.querySelectorAll('.nav-button.active');
+                    activeButtons.forEach(btn => {
+                        if (btn.id !== 'nav-home') btn.classList.remove('active');
+                    });
                 });
                 appContent.appendChild(backButton);
             }
 
-            switch(pageId) {
+            switch (pageId) {
                 case 'nav-home':
                     renderHomePage();
                     break;
                 case 'nav-tariffs':
                     renderTariffsPage();
-                    break;
-                case 'nav-history':
-                    renderHistoryPage();
                     break;
                 case 'nav-profile':
                     renderProfilePage();
@@ -610,6 +732,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Функция рендеринга главной страницы
         function renderHomePage() {
             updateTariffInfo();
+            updateUserHistory(); // Обновляем историю действий
 
             // Остаток по тарифу
             const balanceSection = document.createElement('div');
@@ -651,6 +774,128 @@ document.addEventListener('DOMContentLoaded', () => {
             balanceSection.appendChild(balanceInfo);
 
             appContent.appendChild(balanceSection);
+
+            // Добавляем раздел "История"
+            const historySection = document.createElement('div');
+            historySection.className = 'history-section';
+
+            const historyTitle = document.createElement('h2');
+            historyTitle.textContent = 'История';
+            historySection.appendChild(historyTitle);
+
+            // Проверяем наличие действий в истории
+            if (userHistory.length === 0) {
+                const emptyMessage = document.createElement('p');
+                emptyMessage.textContent = 'Пока нет действий.';
+                historySection.appendChild(emptyMessage);
+            } else {
+                userHistory.forEach(item => {
+                    const actionItem = document.createElement('div');
+                    actionItem.className = 'history-item';
+
+                    const itemTitle = document.createElement('h3');
+                    if (item.type === 'download') {
+                        itemTitle.textContent = `Скачано видео: ${item.title}`;
+                    } else if (item.type === 'subscription') {
+                        itemTitle.textContent = `Оформлен тариф: ${item.tariffName}`;
+                    } else if (item.type === 'publication') {
+                        itemTitle.textContent = `Публикация в группе`;
+                    }
+                    actionItem.appendChild(itemTitle);
+
+                    const itemDate = document.createElement('p');
+                    itemDate.textContent = `Дата: ${item.date}`;
+                    actionItem.appendChild(itemDate);
+
+                    // Добавляем обработчик клика для отображения подробной информации
+                    actionItem.addEventListener('click', () => {
+                        showActionDetails(item);
+                    });
+
+                    historySection.appendChild(actionItem);
+                });
+            }
+
+            appContent.appendChild(historySection);
+        }
+
+        // Функция отображения подробной информации о действии
+        function showActionDetails(item) {
+            // Создаем затемненный фон
+            const overlay = document.createElement('div');
+            overlay.className = 'popup-overlay';
+            overlay.addEventListener('click', () => {
+                overlay.remove();
+            });
+
+            // Создаем окно попапа
+            const popup = document.createElement('div');
+            popup.className = 'popup-content';
+            popup.addEventListener('click', (e) => {
+                e.stopPropagation(); // Останавливаем всплытие события, чтобы клик внутри попапа не закрывал его
+            });
+
+            // Кнопка закрытия
+            const closeButton = document.createElement('button');
+            closeButton.className = 'popup-close-button';
+            closeButton.innerHTML = '&times;';
+            closeButton.addEventListener('click', () => {
+                overlay.remove();
+            });
+            popup.appendChild(closeButton);
+
+            if (item.type === 'download') {
+                const title = document.createElement('h3');
+                title.textContent = `Скачанное видео: ${item.title}`;
+                popup.appendChild(title);
+
+                const source = document.createElement('p');
+                source.textContent = `Источник: ${item.source}`;
+                popup.appendChild(source);
+
+                const link = document.createElement('p');
+                link.innerHTML = `Ссылка: <a href="${item.link}" target="_blank">${item.link}</a>`;
+                popup.appendChild(link);
+
+                const size = document.createElement('p');
+                size.textContent = `Размер: ${item.size} МБ`;
+                popup.appendChild(size);
+
+                const date = document.createElement('p');
+                date.textContent = `Дата скачивания: ${item.date}`;
+                popup.appendChild(date);
+            } else if (item.type === 'subscription') {
+                const title = document.createElement('h3');
+                title.textContent = `Тариф: ${item.tariffName}`;
+                popup.appendChild(title);
+
+                const quantity = document.createElement('p');
+                quantity.textContent = `Количество видео: ${item.quantity}`;
+                popup.appendChild(quantity);
+
+                const price = document.createElement('p');
+                price.textContent = `Цена: ${item.price}`;
+                popup.appendChild(price);
+
+                const date = document.createElement('p');
+                date.textContent = `Время покупки: ${item.date}`;
+                popup.appendChild(date);
+            } else if (item.type === 'publication') {
+                const title = document.createElement('h3');
+                title.textContent = `Публикация в группе`;
+                popup.appendChild(title);
+
+                const groupName = document.createElement('p');
+                groupName.textContent = `Название группы: ${item.groupName}`;
+                popup.appendChild(groupName);
+
+                const date = document.createElement('p');
+                date.textContent = `Время публикации: ${item.date}`;
+                popup.appendChild(date);
+            }
+
+            overlay.appendChild(popup);
+            document.body.appendChild(overlay);
         }
 
         // Функция рендеринга страницы "Тарифы"
@@ -701,7 +946,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 {
                     name: 'Бизнес',
                     description: 'Для скачивания доступно 3000 видео',
-                    price: '9999₽',
+                    price: '6999₽',
                     image: '',
                     action: 'Оформить',
                     quantity: 3000
@@ -757,7 +1002,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.addEventListener('click', () => {
                     if (tariff.action === 'Связаться') {
                         // Открыть чат с менеджером
-                        tg.sendData(JSON.stringify({action: 'contact_manager'}));
+                        tg.sendData(JSON.stringify({action: 'contact_manager', username: managerUsername}));
                     } else {
                         // Активировать тариф
                         startPayment(tariff);
@@ -787,6 +1032,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Обновляем информацию о тарифе
             updateTariffInfo();
 
+            // Добавляем действие в историю
+            const subscriptionAction = {
+                type: 'subscription',
+                tariffName: tariff.name,
+                quantity: tariff.quantity,
+                price: tariff.price,
+                date: new Date().toLocaleString()
+            };
+            userHistory.unshift(subscriptionAction);
+
             // Создаем уведомление
             let notification = {
                 id: Date.now(),
@@ -807,43 +1062,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Переходим на главную страницу
             navigateTo('nav-home');
-        }
-
-        // Функция рендеринга страницы "История"
-        function renderHistoryPage() {
-            updateDownloadHistory();
-
-            const historyDiv = document.createElement('div');
-            historyDiv.style.padding = '20px';
-            historyDiv.style.paddingTop = '60px';
-
-            const title = document.createElement('h2');
-            title.textContent = 'История загрузок';
-            title.style.marginBottom = '20px';
-            historyDiv.appendChild(title);
-
-            if (downloadHistory.length === 0) {
-                const emptyMessage = document.createElement('p');
-                emptyMessage.textContent = 'Вы еще не скачивали видео.';
-                historyDiv.appendChild(emptyMessage);
-            } else {
-                downloadHistory.forEach(item => {
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'history-item';
-
-                    const itemTitle = document.createElement('h3');
-                    itemTitle.textContent = item.title;
-                    historyItem.appendChild(itemTitle);
-
-                    const itemDate = document.createElement('p');
-                    itemDate.textContent = `Дата: ${item.date}`;
-                    historyItem.appendChild(itemDate);
-
-                    historyDiv.appendChild(historyItem);
-                });
-            }
-
-            appContent.appendChild(historyDiv);
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('nav-home').classList.add('active');
         }
 
         // Функция рендеринга страницы "Профиль"
@@ -913,11 +1135,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Обработчик клика для открытия страницы уведомлений
             notificationsSetting.addEventListener('click', () => {
-                navigateTo('nav-notifications'); // Используем navigateTo для консистентности
+                navigateTo('nav-notifications');
             });
 
             settingsDiv.appendChild(notificationsSetting);
 
+            // Настройка "Подсветка"
             const highlightSetting = document.createElement('div');
             highlightSetting.className = 'settings-item';
 
@@ -959,7 +1182,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Добавляем обработчик события для открытия чата с менеджером
             supportSetting.addEventListener('click', () => {
-                tg.sendData(JSON.stringify({action: 'contact_manager'}));
+                tg.sendData(JSON.stringify({action: 'contact_manager', username: managerUsername}));
             });
 
             settingsDiv.appendChild(supportSetting);
@@ -976,7 +1199,9 @@ document.addEventListener('DOMContentLoaded', () => {
             backButton.className = 'back-button';
             backButton.innerHTML = '←';
             backButton.addEventListener('click', () => {
-                navigateTo('nav-settings'); // Возвращаемся в настройки
+                navigateTo('nav-settings');
+                document.getElementById('nav-settings').classList.add('active');
+                document.getElementById('nav-notifications').classList.remove('active');
             });
             appContent.appendChild(backButton);
 
@@ -988,13 +1213,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Кнопка "Прочитать все"
             const markAllReadButton = document.createElement('button');
+            markAllReadButton.className = 'mark-all-read-button';
             markAllReadButton.textContent = 'Прочитать все';
             markAllReadButton.addEventListener('click', () => {
                 notifications.forEach(n => n.read = true);
                 updateNotificationsCounter();
                 renderNotificationsPage(); // Обновляем страницу
             });
-            markAllReadButton.style.margin = '20px'; // Добавляем отступ
             appContent.appendChild(markAllReadButton);
 
             // Список уведомлений
@@ -1032,56 +1257,24 @@ document.addEventListener('DOMContentLoaded', () => {
             appContent.appendChild(notificationsList);
         }
 
-        // Функция переключения подсветки
-        function toggleHighlight() {
-            if (isHighlightEnabled) {
-                gradientElem.style.display = 'block';
-            } else {
-                gradientElem.style.display = 'none';
-            }
-        }
-
-        // Функция отображения уведомления
-        function showNotificationBanner(notification) {
-            const banner = document.createElement('div');
-            banner.className = 'notification-banner';
-
-            const bannerTitle = document.createElement('p');
-            bannerTitle.textContent = notification.title;
-            banner.appendChild(bannerTitle);
-
-            const bannerMessage = document.createElement('p');
-            bannerMessage.textContent = notification.message;
-            banner.appendChild(bannerMessage);
-
-            const acceptButton = document.createElement('span');
-            acceptButton.className = 'notification-accept-button';
-            acceptButton.textContent = 'Принято';
-            acceptButton.addEventListener('click', () => {
-                notification.read = true;
-                updateNotificationsCounter();
-                banner.remove();
+        // Навигационные кнопки
+        const navButtons = document.querySelectorAll('.nav-button');
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                navigateTo(button.id);
             });
-            banner.appendChild(acceptButton);
+        });
 
-            // Добавляем баннер в приложение
-            document.body.appendChild(banner);
+        // Изначально устанавливаем состояние подсветки
+        toggleHighlight();
 
-            // Анимация появления баннера
-            setTimeout(() => {
-                banner.classList.add('show');
-            }, 10);
+        // Обработка безопасных зон
+        tg.onEvent('safeAreaChanged', updateSafeArea);
+        tg.onEvent('viewportChanged', updateSafeArea);
 
-            // Убираем баннер через 2 секунды, если не нажато "Принято"
-            setTimeout(() => {
-                if (!notification.read) {
-                    banner.classList.remove('show');
-                    setTimeout(() => {
-                        banner.remove();
-                    }, 300);
-                }
-            }, 2000);
-        }
+        updateSafeArea();
 
         // Убираем загрузчик и показываем приложение
         setTimeout(() => {
@@ -1090,34 +1283,12 @@ document.addEventListener('DOMContentLoaded', () => {
             navigateTo('nav-home'); // Переходим на главную страницу
         }, 500); // Имитируем загрузку данных
 
-        // Обработка событий активации и деактивации WebApp
-        tg.onEvent('activeChanged', function() {
-            console.log('WebApp active state changed:', tg.isActive);
-        });
-
-        tg.onEvent('fullscreenChanged', function() {
-            console.log('Fullscreen mode changed:', tg.isFullscreen);
-        });
-
-        // Обработка безопасных зон
-        function updateSafeArea() {
-            const safeArea = tg.safeAreaInset;
-            appContent.style.paddingTop = (safeArea.top + 20) + 'px';
-            appContent.style.paddingBottom = (safeArea.bottom + 20) + 'px';
-        }
-
-        tg.onEvent('safeAreaChanged', updateSafeArea);
-        tg.onEvent('viewportChanged', updateSafeArea);
-
-        updateSafeArea();
-
-        // Изначально устанавливаем состояние подсветки
-        toggleHighlight();
-
     } catch (error) {
         console.error('Произошла ошибка:', error);
     }
 });
-</script>
+
+    </script>
 </body>
 </html>
+
