@@ -585,7 +585,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Функция создания пользователя на сервере
     function createUser() {
-        fetch('https://ВАШ_ДОМЕН/api/users', {
+        fetch('https://videoapp-production-4c37.up.railway.app/api/users', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -924,7 +924,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Функция для активации тарифа
     function startPayment(tariff) {
         // Проверяем, нет ли уже активного тарифа
-        fetch(`https://ВАШ_ДОМЕН/api/users/${telegramId}`)
+        fetch(`https://videoapp-production-4c37.up.railway.app/api/users/${telegramId}`)
             .then(response => response.json())
             .then(userData => {
                 if (userData.subscription_status === 'active') {
@@ -943,7 +943,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Функция активации тарифа на сервере
     function activateTariff(tariff) {
-        fetch(`https://ВАШ_ДОМЕН/api/users/${telegramId}/activate_tariff`, {
+        fetch(`https://videoapp-production-4c37.up.railway.app/api/users/${telegramId}/activate_tariff`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
