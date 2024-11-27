@@ -64,7 +64,7 @@ BUCKET_NAME = 'class-18'  # Замените на имя вашего бакет
 DB_FILE_KEY = 'vk_groups.db'  # Имя файла базы данных в бакете
 
 # URL мини-приложения для обновления баланса
-MINI_APP_URL = 'https://your-mini-app-url'  # Замените на URL вашего мини-приложения
+MINI_APP_URL = 'https://vaidap-production.up.railway.app'  # Замените на URL вашего мини-приложения
 
 # Настройка клиента S3 для Yandex Cloud
 s3_client = boto3.client(
